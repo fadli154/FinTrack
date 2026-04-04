@@ -6,7 +6,8 @@ import '../../controllers/auth_controller.dart';
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
-  final authC = Get.put(AuthController());
+  final authC = Get.find<AuthController>();
+
   final themeController = Get.put(ThemeController());
 
   final emailC = TextEditingController();

@@ -1,3 +1,4 @@
+import 'package:fintrack/partials/my_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:get/get.dart';
@@ -36,18 +37,8 @@ class MyMainPage extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          Obx(
-            () => Switch(
-              value: themeController.isDark.value,
-              activeThumbColor: Colors.white,
-              inactiveThumbColor: Colors.grey,
-              onChanged: (value) {
-                themeController.toggleTheme();
-              },
-            ),
-          ),
-        ],
+        actionsIconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
       ),
       body: Obx(() => _pages[pageController.pageIndex.value]),
@@ -72,6 +63,8 @@ class MyMainPage extends StatelessWidget {
           onTap: (int i) => pageController.changePage(i),
         ),
       ),
+
+      drawer: MyDrawer(colors: colors, themeController: themeController),
     );
   }
 }

@@ -6,7 +6,7 @@ import '../../controllers/auth_controller.dart';
 class RegisterPage extends StatelessWidget {
   RegisterPage({super.key});
 
-  final authC = Get.put(AuthController());
+  final authC = Get.find<AuthController>();
   final themeController = Get.put(ThemeController());
 
   final emailC = TextEditingController();

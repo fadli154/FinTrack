@@ -1,4 +1,4 @@
-import 'package:get/instance_manager.dart';
+import 'package:get/get.dart';
 import 'package:fintrack/controllers/page_controller.dart';
 
 class PageBinding extends Bindings {

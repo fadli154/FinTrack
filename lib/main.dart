@@ -1,3 +1,4 @@
+import 'package:fintrack/bindings/auth_binding.dart';
 import 'package:fintrack/pages/auth/login_page.dart';
 import 'package:fintrack/pages/auth/register_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -57,12 +58,20 @@ class MyApp extends StatelessWidget {
 
       home: IntroductionPage(),
       getPages: [
-        GetPage(name: '/login', page: () => LoginPage()),
-        GetPage(name: '/register', page: () => RegisterPage()),
+        GetPage(
+          name: '/login',
+          page: () => LoginPage(),
+          bindings: [AuthBinding()],
+        ),
+        GetPage(
+          name: '/register',
+          page: () => RegisterPage(),
+          bindings: [AuthBinding()],
+        ),
         GetPage(
           name: '/main',
           page: () => MyMainPage(title: 'FinTrack'),
-          bindings: [PageBinding()],
+          bindings: [PageBinding(), AuthBinding()],
         ),
       ],
     );
