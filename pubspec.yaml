@@ -1,0 +1,33 @@
+name: fintrack
+description: "A new Flutter project."
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  cloud_firestore: ^6.2.0
+  convex_bottom_bar: ^3.2.0
+  firebase_auth: ^6.3.0
+  firebase_core: ^4.6.0
+  flutter:
+    sdk: flutter
+  get: ^4.7.3
+  introduction_screen: ^4.0.0
+  lottie: ^3.3.2
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets\lotties\MoneyInvestment.json
+    - assets\lotties\Revenue.json
+    - assets\particles\Ellipse1.png
+    - assets\particles\Ellipse2.png
+    - assets\particles\Rectangle1.png

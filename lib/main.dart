@@ -1,0 +1,70 @@
+import 'package:fintrack/pages/auth/login_page.dart';
+import 'package:fintrack/pages/auth/register_page.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fintrack/bindings/page_binding.dart';
+import 'package:fintrack/pages/introduction_page.dart';
+// import 'package:fintrack/pages/main/home.dart';
+import 'package:fintrack/pages/main/main_page.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        primaryColor: Colors.teal,
+        scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
+
+        colorScheme: ColorScheme.dark(
+          primary: Colors.teal,
+          secondary: Colors.white,
+          surface: Colors.teal,
+          tertiary: const Color.fromARGB(171, 0, 0, 0),
+        ),
+      ),
+
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primaryColor: const Color.fromARGB(255, 53, 53, 53),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 44, 44, 44),
+
+        colorScheme: ColorScheme.dark(
+          primary: Color.fromARGB(255, 53, 53, 53),
+          secondary: Color.fromARGB(255, 70, 70, 70),
+          surface: const Color.fromARGB(180, 1, 223, 200),
+          tertiary: const Color.fromARGB(130, 255, 255, 255),
+        ),
+
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color.fromARGB(255, 26, 26, 26),
+          foregroundColor: Colors.teal,
+        ),
+      ),
+
+      themeMode: ThemeMode.system,
+
+      home: IntroductionPage(),
+      getPages: [
+        GetPage(name: '/login', page: () => LoginPage()),
+        GetPage(name: '/register', page: () => RegisterPage()),
+        GetPage(
+          name: '/main',
+          page: () => MyMainPage(title: 'FinTrack'),
+          bindings: [PageBinding()],
+        ),
+      ],
+    );
+  }
+}
