@@ -63,6 +63,11 @@ class MyApp extends StatelessWidget {
       home: InitPage(),
       getPages: [
         GetPage(
+          name: '/init',
+          page: () => InitPage(),
+          bindings: [AuthBinding()],
+        ),
+        GetPage(
           name: '/login',
           page: () => LoginPage(),
           bindings: [AuthBinding()],

@@ -1,6 +1,7 @@
 import 'package:fintrack/controllers/thme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/auth_controller.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -9,6 +10,7 @@ class RegisterPage extends StatelessWidget {
   final authC = Get.find<AuthController>();
   final themeController = Get.put(ThemeController());
 
+  final nameC = TextEditingController();
   final emailC = TextEditingController();
   final passC = TextEditingController();
 
@@ -31,12 +33,49 @@ class RegisterPage extends StatelessWidget {
               ),
             ),
             Positioned(
-              top: -40,
-              right: -20,
+              top: -35,
+              right: -10,
               child: Image.asset(
                 'assets/particles/Ellipse2.png',
                 width: 400,
                 height: 400,
+              ),
+            ),
+
+            Positioned(
+              bottom: -90,
+              left: -200,
+
+              child: Image.asset(
+                'assets/particles/Rectangle1.png',
+                width: 400,
+                height: 400,
+              ),
+            ),
+            Positioned(
+              bottom: -90,
+              left: -200,
+
+              child: Transform.rotate(
+                angle: 230,
+                child: Image.asset(
+                  'assets/particles/Rectangle1.png',
+                  width: 400,
+                  height: 400,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: -160,
+              left: -100,
+
+              child: Transform.rotate(
+                angle: 200,
+                child: Image.asset(
+                  'assets/particles/Rectangle1.png',
+                  width: 400,
+                  height: 400,
+                ),
               ),
             ),
 
@@ -58,30 +97,85 @@ class RegisterPage extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 80, bottom: 20),
                           child: Text(
                             "Register here",
-                            style: TextStyle(
-                              color: colors.surface,
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Poppins',
+                            style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                color: colors.surface,
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
 
                         Container(
                           padding: const EdgeInsets.only(bottom: 80),
-                          width: 200,
+                          width: 260,
                           child: Text(
                             textAlign: TextAlign.center,
-                            "Welcome back you've been missed!",
-                            style: TextStyle(
-                              color: colors.tertiary,
-                              fontSize: 20,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w500,
-                              textBaseline: TextBaseline.alphabetic,
+                            "Create your account to get started",
+                            style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                color: colors.tertiary,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                textBaseline: TextBaseline.alphabetic,
+                              ),
                             ),
                           ),
                         ),
+
+                        TextField(
+                          controller: nameC,
+                          keyboardType: TextInputType.name,
+                          style: TextStyle(color: colors.onSurface),
+
+                          decoration: InputDecoration(
+                            labelText: "Name",
+
+                            filled: true,
+                            fillColor: colors.surface.withValues(alpha: .35),
+
+                            prefixIcon: Icon(Icons.person),
+                            prefixIconColor: const Color.fromARGB(
+                              221,
+                              255,
+                              255,
+                              255,
+                            ),
+                            floatingLabelBehavior: FloatingLabelBehavior.never,
+
+                            labelStyle: TextStyle(
+                              color: const Color.fromARGB(220, 255, 255, 255),
+                            ),
+
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: const Color.fromARGB(0, 0, 0, 0),
+                              ),
+                            ),
+
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: colors.primary,
+                                width: 2,
+                              ),
+                            ),
+
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.red),
+                            ),
+
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 20,
+                              horizontal: 15,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
 
                         // EMAIL
                         TextField(
@@ -238,7 +332,11 @@ class RegisterPage extends StatelessWidget {
                                 onPressed: authC.isLoading.value
                                     ? null
                                     : () {
-                                        authC.register(emailC.text, passC.text);
+                                        authC.register(
+                                          nameC.text,
+                                          emailC.text,
+                                          passC.text,
+                                        );
                                       },
                                 child: authC.isLoading.value
                                     ? const CircularProgressIndicator(
@@ -246,9 +344,12 @@ class RegisterPage extends StatelessWidget {
                                       )
                                     : Text(
                                         "Register",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: colors.secondary,
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                            fontSize: 16,
+                                            color: colors.secondary,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
                                       ),
                               ),
@@ -270,9 +371,11 @@ class RegisterPage extends StatelessWidget {
                               children: [
                                 TextSpan(
                                   text: "Login",
-                                  style: TextStyle(
-                                    color: colors.surface,
-                                    fontWeight: FontWeight.bold,
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      color: colors.surface,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -282,42 +385,6 @@ class RegisterPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                ),
-              ),
-            ),
-
-            Positioned(
-              bottom: -90,
-              left: -200,
-              child: Image.asset(
-                'assets/particles/Rectangle1.png',
-                width: 400,
-                height: 400,
-              ),
-            ),
-            Positioned(
-              bottom: -90,
-              left: -200,
-
-              child: Transform.rotate(
-                angle: 230,
-                child: Image.asset(
-                  'assets/particles/Rectangle1.png',
-                  width: 400,
-                  height: 400,
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: -160,
-              left: -100,
-
-              child: Transform.rotate(
-                angle: 200,
-                child: Image.asset(
-                  'assets/particles/Rectangle1.png',
-                  width: 400,
-                  height: 400,
                 ),
               ),
             ),

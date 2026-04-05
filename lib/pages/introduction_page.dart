@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:lottie/lottie.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class IntroductionPage extends StatelessWidget {
   const IntroductionPage({super.key});
@@ -60,7 +61,6 @@ class IntroductionPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // 🔥 BACKGROUND GRADIENT
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -132,12 +132,18 @@ class IntroductionPage extends StatelessWidget {
               ),
             ),
 
-            onDone: () {
-              Get.offNamed('/login');
+            onDone: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setBool('onboarding_done', true);
+
+              Get.offAllNamed('/init');
             },
 
-            onSkip: () {
-              Get.offNamed('/login');
+            onSkip: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setBool('onboarding_done', true);
+
+              Get.offAllNamed('/init');
             },
 
             dotsDecorator: DotsDecorator(

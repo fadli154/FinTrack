@@ -1,6 +1,7 @@
 import 'package:fintrack/controllers/thme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/auth_controller.dart';
 
 class LoginPage extends StatelessWidget {
@@ -32,8 +33,8 @@ class LoginPage extends StatelessWidget {
               ),
             ),
             Positioned(
-              top: -40,
-              right: -20,
+              top: -35,
+              right: -10,
               child: Image.asset(
                 'assets/particles/Ellipse2.png',
                 width: 400,
@@ -45,7 +46,7 @@ class LoginPage extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.only(
-                    bottom: 110,
+                    bottom: 20,
                     left: 20,
                     right: 20,
                   ),
@@ -59,27 +60,29 @@ class LoginPage extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 80, bottom: 20),
                           child: Text(
                             "Login here",
-                            style: TextStyle(
-                              color: colors.surface,
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Poppins',
+                            style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                color: colors.surface,
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
 
                         Container(
                           padding: const EdgeInsets.only(bottom: 80),
-                          width: 200,
+                          width: 260,
                           child: Text(
                             textAlign: TextAlign.center,
                             "Welcome back you've been missed!",
-                            style: TextStyle(
-                              color: colors.tertiary,
-                              fontSize: 20,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w500,
-                              textBaseline: TextBaseline.alphabetic,
+                            style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                color: colors.tertiary,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                textBaseline: TextBaseline.alphabetic,
+                              ),
                             ),
                           ),
                         ),
@@ -204,7 +207,37 @@ class LoginPage extends StatelessWidget {
                           ),
                         ),
 
-                        const SizedBox(height: 70),
+                        const SizedBox(height: 15),
+
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              if (emailC.text.isEmpty) {
+                                authC.showSnack(
+                                  title: "Error",
+                                  message: "Masukkan email dulu",
+                                  isError: true,
+                                );
+                                return;
+                              }
+
+                              authC.forgotPassword(emailC.text);
+                            },
+                            child: Text(
+                              "Forgot Your Password?",
+                              style: GoogleFonts.poppins(
+                                textStyle: TextStyle(
+                                  color: colors.surface,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 25),
 
                         // BUTTON
                         Obx(
@@ -247,9 +280,12 @@ class LoginPage extends StatelessWidget {
                                       )
                                     : Text(
                                         "Login",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: colors.secondary,
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: colors.secondary,
+                                          ),
                                         ),
                                       ),
                               ),
@@ -271,12 +307,52 @@ class LoginPage extends StatelessWidget {
                               children: [
                                 TextSpan(
                                   text: "Register",
-                                  style: TextStyle(
-                                    color: colors.surface,
-                                    fontWeight: FontWeight.bold,
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      color: colors.surface,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                               ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 50),
+
+                        Text(
+                          'Or continue with',
+                          style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                              color: colors.tertiary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: colors.surface.withValues(alpha: 0.7),
+                                blurRadius: 2,
+                              ),
+                            ],
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              authC.loginWithGoogle();
+                              print("baok");
+                            },
+                            icon: Image.network(
+                              'https://cdn-icons-png.flaticon.com/512/281/281764.png',
+                              height: 20,
                             ),
                           ),
                         ),
@@ -290,18 +366,7 @@ class LoginPage extends StatelessWidget {
             Positioned(
               bottom: -90,
               left: -200,
-              child: Image.asset(
-                'assets/particles/Rectangle1.png',
-                width: 400,
-                height: 400,
-              ),
-            ),
-            Positioned(
-              bottom: -90,
-              left: -200,
-
-              child: Transform.rotate(
-                angle: 230,
+              child: IgnorePointer(
                 child: Image.asset(
                   'assets/particles/Rectangle1.png',
                   width: 400,
@@ -310,15 +375,30 @@ class LoginPage extends StatelessWidget {
               ),
             ),
             Positioned(
+              bottom: -90,
+              left: -200,
+              child: IgnorePointer(
+                child: Transform.rotate(
+                  angle: 230,
+                  child: Image.asset(
+                    'assets/particles/Rectangle1.png',
+                    width: 400,
+                    height: 400,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
               bottom: -160,
               left: -100,
-
-              child: Transform.rotate(
-                angle: 200,
-                child: Image.asset(
-                  'assets/particles/Rectangle1.png',
-                  width: 400,
-                  height: 400,
+              child: IgnorePointer(
+                child: Transform.rotate(
+                  angle: 200,
+                  child: Image.asset(
+                    'assets/particles/Rectangle1.png',
+                    width: 400,
+                    height: 400,
+                  ),
                 ),
               ),
             ),

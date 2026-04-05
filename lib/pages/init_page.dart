@@ -10,9 +10,9 @@ class InitPage extends StatelessWidget {
     final prefs = await SharedPreferences.getInstance();
     final onboardingDone = prefs.getBool('onboarding_done') ?? false;
 
-    final user = FirebaseAuth.instance.currentUser;
+    await FirebaseAuth.instance.authStateChanges().first;
 
-    await Future.delayed(const Duration(seconds: 1));
+    final user = FirebaseAuth.instance.currentUser;
 
     if (!onboardingDone) return "intro";
     if (user != null) return "main";
@@ -24,13 +24,13 @@ class InitPage extends StatelessWidget {
     return FutureBuilder<String>(
       future: checkFlow(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState != ConnectionState.done) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        Future.microtask(() {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
           if (snapshot.data == "intro") {
             Get.offAllNamed('/intro');
           } else if (snapshot.data == "main") {
