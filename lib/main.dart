@@ -29,14 +29,16 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         brightness: Brightness.dark,
-        primaryColor: Colors.teal,
+        primaryColor: const Color.fromARGB(255, 0, 181, 163),
         scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
 
         colorScheme: ColorScheme.dark(
-          primary: Colors.teal,
+          primary: const Color.fromARGB(255, 0, 183, 165),
           secondary: Colors.white,
-          surface: Colors.teal,
+          surface: const Color.fromARGB(255, 0, 185, 167),
           tertiary: const Color.fromARGB(171, 0, 0, 0),
+          inversePrimary: const Color.fromARGB(255, 0, 183, 165),
+          inverseSurface: const Color.fromARGB(255, 255, 255, 255),
         ),
       ),
 
@@ -48,13 +50,15 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.dark(
           primary: Color.fromARGB(255, 53, 53, 53),
           secondary: Color.fromARGB(255, 70, 70, 70),
-          surface: const Color.fromARGB(180, 1, 223, 200),
-          tertiary: const Color.fromARGB(130, 255, 255, 255),
+          surface: const Color.fromARGB(180, 14, 201, 117),
+          tertiary: const Color.fromARGB(208, 255, 255, 255),
+          inversePrimary: const Color.fromARGB(255, 226, 226, 226),
+          inverseSurface: const Color.fromARGB(186, 255, 255, 255),
         ),
 
         appBarTheme: AppBarTheme(
           backgroundColor: Color.fromARGB(255, 26, 26, 26),
-          foregroundColor: Colors.teal,
+          foregroundColor: const Color.fromARGB(255, 0, 181, 163),
         ),
       ),
 

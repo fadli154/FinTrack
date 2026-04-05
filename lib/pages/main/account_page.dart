@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MyAccountPage extends StatelessWidget {
   final String title;
@@ -10,15 +11,19 @@ class MyAccountPage extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.black,
       body: SafeArea(
         child: Column(
           children: [
-            // 🔥 HEADER
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.grey.shade900,
+                color: colors.secondary,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 5,
+                  ),
+                ],
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30),
@@ -28,19 +33,23 @@ class MyAccountPage extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 35,
-                    backgroundColor: Colors.grey.shade700,
-                    child: const Icon(Icons.person, size: 40),
+                    backgroundColor: colors.primary,
+                    child: Icon(
+                      Icons.person,
+                      size: 40,
+                      color: colors.inverseSurface,
+                    ),
                   ),
                   const SizedBox(width: 15),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         "Fadli",
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          color: colors.inversePrimary,
                         ),
                       ),
                       Text(
@@ -60,35 +69,55 @@ class MyAccountPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  _buildMenuItem(
-                    icon: Icons.workspace_premium,
-                    title: "Pusat Premium",
+                  ListTile(
+                    leading: Icon(
+                      Icons.workspace_premium,
+                      color: Color.fromARGB(255, 206, 192, 72),
+                    ),
+                    title: Text(
+                      "Pusat Premium",
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 206, 192, 72),
+                      ),
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.chevron_right,
+                          color: Color.fromARGB(255, 206, 192, 72),
+                        ),
+                      ],
+                    ),
                   ),
 
                   const SizedBox(height: 10),
 
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade900,
+                      color: colors.surface,
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Column(
                       children: [
                         _buildMenuItem(
+                          context,
                           icon: Icons.thumb_up_alt_outlined,
                           title: "Rekomendasikan ke teman",
                         ),
-                        _divider(),
+                        _divider(context),
                         _buildMenuItem(
+                          context,
                           icon: Icons.block,
                           title: "Blokir Iklan",
                         ),
-                        _divider(),
+                        _divider(context),
                         _buildMenuItem(
+                          context,
                           icon: Icons.settings,
                           title: "Pengaturan",
                         ),
-                        _divider(),
+                        _divider(context),
                       ],
                     ),
                   ),
@@ -101,15 +130,16 @@ class MyAccountPage extends StatelessWidget {
     );
   }
 
-  // 🔥 MENU ITEM
-  Widget _buildMenuItem({
+  Widget _buildMenuItem(
+    BuildContext context, {
     required IconData icon,
     required String title,
     bool showDot = false,
   }) {
+    final colors = Theme.of(context).colorScheme;
     return ListTile(
-      leading: Icon(icon, color: Colors.amber),
-      title: Text(title, style: const TextStyle(color: Colors.white)),
+      leading: Icon(icon, color: colors.inverseSurface),
+      title: Text(title, style: TextStyle(color: colors.inverseSurface)),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -123,14 +153,16 @@ class MyAccountPage extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
             ),
-          const Icon(Icons.chevron_right, color: Colors.grey),
+          Icon(Icons.chevron_right, color: colors.inverseSurface),
         ],
       ),
       onTap: () {},
     );
   }
 
-  Widget _divider() {
-    return Divider(color: Colors.grey.shade800, height: 1);
+  Widget _divider(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Divider(color: colors.secondary, height: 1);
   }
 }
