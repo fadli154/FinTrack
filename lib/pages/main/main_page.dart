@@ -17,7 +17,9 @@ class MyMainPage extends StatelessWidget {
   final themeController = Get.put(ThemeController());
 
   final List<Widget> _pages = [
-    MyHomePage(title: "home"),
+    MyHomePage(title: "Riwayat"),
+    Center(child: Text("Add")),
+    Center(child: Text("Add")),
     Center(child: Text("Add")),
     MyAccountPage(title: "account"),
   ];
@@ -46,20 +48,28 @@ class MyMainPage extends StatelessWidget {
         () => ConvexAppBar(
           backgroundColor: colors.secondary,
           initialActiveIndex: pageController.pageIndex.value,
+
           activeColor: colors.surface,
           color: colors.tertiary,
-          cornerRadius: 5,
-          shadowColor: Colors.black.withValues(alpha: 0.3),
-          elevation: 3,
-          height: 65,
+
+          height: 70,
+          elevation: 8,
+          shadowColor: colors.shadow.withValues(alpha: 0.25),
+
+          cornerRadius: 20,
+          curveSize: 120, // 🔥 biar FAB tengah lebih standout
+          top: -25, // 🔥 lebih natural (ga terlalu naik)
+
           style: TabStyle.fixedCircle,
-          curveSize: 110,
-          top: -35,
-          items: [
-            TabItem(icon: Icons.home, title: 'Home', fontFamily: 'Poppins'),
+
+          items: const [
+            TabItem(icon: Icons.event_note, title: 'Riwayat'),
+            TabItem(icon: Icons.pie_chart, title: 'Grafik'),
             TabItem(icon: Icons.add, title: 'Add'),
-            TabItem(icon: Icons.people, title: 'Profile'),
+            TabItem(icon: Icons.receipt_long_rounded, title: 'Laporan'),
+            TabItem(icon: Icons.person_outline_sharp, title: 'Saya'),
           ],
+
           onTap: (int i) => pageController.changePage(i),
         ),
       ),

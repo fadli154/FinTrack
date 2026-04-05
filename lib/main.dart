@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.dark(
           primary: Color.fromARGB(255, 53, 53, 53),
           secondary: Color.fromARGB(255, 70, 70, 70),
-          surface: const Color.fromARGB(180, 14, 201, 117),
+          surface: const Color.fromARGB(152, 14, 201, 117),
           tertiary: const Color.fromARGB(208, 255, 255, 255),
           inversePrimary: const Color.fromARGB(255, 226, 226, 226),
           inverseSurface: const Color.fromARGB(186, 255, 255, 255),
