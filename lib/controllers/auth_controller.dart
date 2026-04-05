@@ -59,6 +59,21 @@ class AuthController extends GetxController {
 
   Future<void> forgotPassword(String email) async {
     try {
+      final result = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (result.docs.isEmpty) {
+        showSnack(
+          title: "Error",
+          message: "Email tidak terdaftar",
+          isError: true,
+        );
+        return;
+      }
+
       await _auth.sendPasswordResetEmail(email: email);
 
       showSnack(
@@ -124,7 +139,11 @@ class AuthController extends GetxController {
 
       Get.offAllNamed('/init');
     } catch (e) {
-      showSnack(title: "Error", message: "Login Google gagal", isError: true);
+      showSnack(
+        title: "Error",
+        message: "Email atau password salah",
+        isError: true,
+      );
     } finally {
       isLoading.value = false;
     }

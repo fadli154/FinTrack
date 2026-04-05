@@ -23,13 +23,14 @@ class LoginPage extends StatelessWidget {
         child: Stack(
           children: [
             Positioned(
-              top: 0,
+              top: -50,
               right: 0,
               child: Image.asset(
                 'assets/particles/Ellipse1.png',
                 fit: BoxFit.cover, // Ensures it fills the stack area
                 width: 260,
                 height: 260,
+                color: colors.tertiary.withValues(alpha: 0.1),
               ),
             ),
             Positioned(
@@ -39,6 +40,50 @@ class LoginPage extends StatelessWidget {
                 'assets/particles/Ellipse2.png',
                 width: 400,
                 height: 400,
+                color: colors.tertiary.withValues(alpha: 0.1),
+              ),
+            ),
+
+            Positioned(
+              bottom: -90,
+              left: -200,
+              child: IgnorePointer(
+                child: Image.asset(
+                  'assets/particles/Rectangle1.png',
+                  width: 400,
+                  height: 400,
+                  color: colors.tertiary.withValues(alpha: 0.1),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: -90,
+              left: -200,
+              child: IgnorePointer(
+                child: Transform.rotate(
+                  angle: 230,
+                  child: Image.asset(
+                    'assets/particles/Rectangle1.png',
+                    width: 400,
+                    height: 400,
+                    color: colors.tertiary.withValues(alpha: 0.1),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: -160,
+              left: -100,
+              child: IgnorePointer(
+                child: Transform.rotate(
+                  angle: 200,
+                  child: Image.asset(
+                    'assets/particles/Rectangle1.png',
+                    width: 400,
+                    height: 400,
+                    color: colors.tertiary.withValues(alpha: 0.1),
+                  ),
+                ),
               ),
             ),
 
@@ -358,46 +403,6 @@ class LoginPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ),
-                ),
-              ),
-            ),
-
-            Positioned(
-              bottom: -90,
-              left: -200,
-              child: IgnorePointer(
-                child: Image.asset(
-                  'assets/particles/Rectangle1.png',
-                  width: 400,
-                  height: 400,
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: -90,
-              left: -200,
-              child: IgnorePointer(
-                child: Transform.rotate(
-                  angle: 230,
-                  child: Image.asset(
-                    'assets/particles/Rectangle1.png',
-                    width: 400,
-                    height: 400,
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: -160,
-              left: -100,
-              child: IgnorePointer(
-                child: Transform.rotate(
-                  angle: 200,
-                  child: Image.asset(
-                    'assets/particles/Rectangle1.png',
-                    width: 400,
-                    height: 400,
                   ),
                 ),
               ),

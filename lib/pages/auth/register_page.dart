@@ -23,13 +23,14 @@ class RegisterPage extends StatelessWidget {
         child: Stack(
           children: [
             Positioned(
-              top: 0,
+              top: -50,
               right: 0,
               child: Image.asset(
                 'assets/particles/Ellipse1.png',
                 fit: BoxFit.cover, // Ensures it fills the stack area
                 width: 260,
                 height: 260,
+                color: colors.tertiary.withValues(alpha: 0.1),
               ),
             ),
             Positioned(
@@ -38,6 +39,8 @@ class RegisterPage extends StatelessWidget {
               child: Image.asset(
                 'assets/particles/Ellipse2.png',
                 width: 400,
+                color: colors.tertiary.withValues(alpha: 0.1),
+
                 height: 400,
               ),
             ),
@@ -50,6 +53,7 @@ class RegisterPage extends StatelessWidget {
                 'assets/particles/Rectangle1.png',
                 width: 400,
                 height: 400,
+                color: colors.tertiary.withValues(alpha: 0.1),
               ),
             ),
             Positioned(
@@ -62,6 +66,7 @@ class RegisterPage extends StatelessWidget {
                   'assets/particles/Rectangle1.png',
                   width: 400,
                   height: 400,
+                  color: colors.tertiary.withValues(alpha: 0.1),
                 ),
               ),
             ),
@@ -75,6 +80,7 @@ class RegisterPage extends StatelessWidget {
                   'assets/particles/Rectangle1.png',
                   width: 400,
                   height: 400,
+                  color: colors.tertiary.withValues(alpha: 0.1),
                 ),
               ),
             ),
@@ -83,7 +89,7 @@ class RegisterPage extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.only(
-                    bottom: 110,
+                    bottom: 60,
                     left: 20,
                     right: 20,
                   ),
