@@ -10,10 +10,15 @@ import 'package:get/get.dart';
 import 'package:fintrack/bindings/page_binding.dart';
 // import 'package:fintrack/pages/main/home.dart';
 import 'package:fintrack/pages/main/main_page.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await initializeDateFormatting('id', null); // 🔥 WAJIB
   runApp(MyApp());
 }
 
