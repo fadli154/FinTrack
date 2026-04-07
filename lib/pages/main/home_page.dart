@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class MyHomePage extends StatelessWidget {
@@ -36,8 +37,6 @@ class MyHomePage extends StatelessWidget {
 
         final docs = snapshot.data?.docs ?? [];
 
-        print(snapshot.data?.docs);
-
         if (docs.isEmpty) {
           return _emptyState(colors);
         }
@@ -45,8 +44,7 @@ class MyHomePage extends StatelessWidget {
         final groupedData = groupByDate(docs);
         final keys = groupedData.keys.toList();
 
-        return Container(
-          color: const Color(0xFFF5F5F5),
+        return SizedBox(
           child: ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: keys.length,
@@ -62,10 +60,10 @@ class MyHomePage extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text(
                       dateKey,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black54,
+                        color: colors.tertiary,
                       ),
                     ),
                   ),
@@ -79,24 +77,26 @@ class MyHomePage extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colors.secondary,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: Colors.black12),
+                        border: Border.all(
+                          color: colors.tertiary.withValues(alpha: .1),
+                        ),
                       ),
                       child: Row(
                         children: [
                           // ICON
                           Container(
                             padding: const EdgeInsets.all(10),
-                            decoration: const BoxDecoration(
-                              color: Colors.black,
+                            decoration: BoxDecoration(
+                              color: colors.primary,
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
                               isIncome
                                   ? Icons.arrow_downward
                                   : Icons.arrow_upward,
-                              color: Colors.white,
+                              color: Colors.white.withValues(alpha: 0.7),
                               size: 18,
                             ),
                           ),
@@ -109,19 +109,28 @@ class MyHomePage extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  data['title'] ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
+                                  capitalizeEachWord(data['title'] ?? ''),
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: colors.tertiary.withValues(
+                                        alpha: 0.6,
+                                      ),
+                                      decoration: TextDecoration.none,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 3),
                                 Text(
-                                  data['category'] ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black54,
+                                  capitalizeEachWord(data['title'] ?? ''),
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      fontSize: 12,
+                                      color: colors.tertiary.withValues(
+                                        alpha: 0.4,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -131,10 +140,10 @@ class MyHomePage extends StatelessWidget {
                           // AMOUNT
                           Text(
                             "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern('id').format(amount)}",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
-                              color: Colors.black87,
+                              color: colors.tertiary.withValues(alpha: 0.5),
                             ),
                           ),
                         ],
@@ -173,6 +182,16 @@ class MyHomePage extends StatelessWidget {
       ),
     );
   }
+}
+
+String capitalizeEachWord(String text) {
+  return text
+      .split(' ')
+      .map((word) {
+        if (word.isEmpty) return word;
+        return word[0].toUpperCase() + word.substring(1).toLowerCase();
+      })
+      .join(' ');
 }
 
 Map<String, List<Map<String, dynamic>>> groupByDate(
