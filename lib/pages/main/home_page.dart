@@ -344,13 +344,19 @@ class MyHomePage extends StatelessWidget {
 
   void _showEditDialog(
     BuildContext context,
-    Map<String, dynamic> data, [
-    docId,
-  ]) {
+    Map<String, dynamic> data,
+    String docId,
+  ) {
     final colors = Theme.of(context).colorScheme;
     final controller = Get.put(AddController());
 
-    final amountC = TextEditingController(text: data['amount'].toString());
+    final formattedAmount = NumberFormat.currency(
+      locale: 'id',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    ).format(data['amount']);
+
+    final amountC = TextEditingController(text: formattedAmount);
     final noteC = TextEditingController(text: data['note']);
 
     Get.bottomSheet(
@@ -417,11 +423,16 @@ class MyHomePage extends StatelessWidget {
 
               ElevatedButton(
                 onPressed: () async {
+                  final cleanAmount = int.parse(
+                    amountC.text.replaceAll(RegExp(r'[^0-9]'), ''),
+                  );
+
                   await controller.updateTransaction(
                     id: docId,
-                    amount: int.parse(amountC.text),
+                    amount: cleanAmount,
                     note: noteC.text,
                   );
+
                   Get.back();
                 },
                 child: Text(
