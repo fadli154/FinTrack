@@ -58,6 +58,8 @@ class IntroductionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -72,30 +74,65 @@ class IntroductionPage extends StatelessWidget {
           ),
 
           Positioned(
-            top: -10,
-            right: -20,
-            child: IgnorePointer(
-              child: Opacity(
-                opacity: 0.6,
-                child: Image.asset(
-                  'assets/particles/Ellipse3.png',
-                  width: 260,
-                  height: 260,
-                ),
-              ),
+            top: -50,
+            right: 0,
+            child: Image.asset(
+              'assets/particles/Ellipse1.png',
+              fit: BoxFit.cover, // Ensures it fills the stack area
+              width: 260,
+              height: 260,
+              color: colors.tertiary.withValues(alpha: 0.1),
+            ),
+          ),
+          Positioned(
+            top: -35,
+            right: -10,
+            child: Image.asset(
+              'assets/particles/Ellipse2.png',
+              width: 400,
+              height: 400,
+              color: colors.tertiary.withValues(alpha: 0.1),
             ),
           ),
 
           Positioned(
-            top: -40,
-            right: -20,
+            bottom: -90,
+            left: -200,
             child: IgnorePointer(
-              child: Opacity(
-                opacity: 0.5,
+              child: Image.asset(
+                'assets/particles/Rectangle1.png',
+                width: 400,
+                height: 400,
+                color: colors.tertiary.withValues(alpha: 0.1),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -90,
+            left: -200,
+            child: IgnorePointer(
+              child: Transform.rotate(
+                angle: 230,
                 child: Image.asset(
-                  'assets/particles/Ellipse4.png',
+                  'assets/particles/Rectangle1.png',
                   width: 400,
                   height: 400,
+                  color: colors.tertiary.withValues(alpha: 0.1),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -160,
+            left: -100,
+            child: IgnorePointer(
+              child: Transform.rotate(
+                angle: 200,
+                child: Image.asset(
+                  'assets/particles/Rectangle1.png',
+                  width: 400,
+                  height: 400,
+                  color: colors.tertiary.withValues(alpha: 0.1),
                 ),
               ),
             ),
@@ -158,32 +195,6 @@ class IntroductionPage extends StatelessWidget {
             ),
 
             curve: Curves.easeInOut,
-          ),
-          Positioned(
-            bottom: -90,
-            left: -200,
-
-            child: Transform.rotate(
-              angle: 230,
-              child: Image.asset(
-                'assets/particles/Rectangle1.png',
-                width: 400,
-                height: 400,
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -160,
-            left: -100,
-
-            child: Transform.rotate(
-              angle: 200,
-              child: Image.asset(
-                'assets/particles/Rectangle1.png',
-                width: 400,
-                height: 400,
-              ),
-            ),
           ),
         ],
       ),

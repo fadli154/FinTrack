@@ -1,5 +1,7 @@
 import 'package:fintrack/controllers/add_controller.dart';
 import 'package:fintrack/controllers/home_controller.dart';
+import 'package:fintrack/pages/main/chart_page.dart';
+import 'package:fintrack/pages/main/laporan_page.dart';
 import 'package:fintrack/partials/my_drawer.dart';
 import 'package:fintrack/services/currency_input_formatter.dart';
 import 'package:flutter/material.dart';
@@ -23,9 +25,9 @@ class MyMainPage extends StatelessWidget {
 
   final List<Widget> _pages = [
     MyHomePage(title: "Riwayat"),
-    Center(child: Text("Grafik")),
-    Center(child: Text("Add")),
-    Center(child: Text("Laporan")),
+    ChartPage(),
+    Center(child: Text("baok")),
+    LaporanPage(),
     MyAccountPage(title: "account"),
   ];
 
@@ -409,12 +411,14 @@ void _showInputDialog(
                             note: noteC.text,
                             date: selectedDate.value,
                           );
+                          Get.back();
+                          Get.back();
                           // 🎉 Alert
                           AwesomeDialog(
-                            context: context,
+                            context: Get.overlayContext!,
                             dialogType: DialogType
                                 .noHeader, // 🔥 disable default header
-                            animType: AnimType.scale,
+                            animType: AnimType.topSlide,
 
                             dialogBackgroundColor: colors.secondary,
                             barrierColor: colors.shadow.withValues(alpha: 0.25),
@@ -426,7 +430,7 @@ void _showInputDialog(
 
                                 Icon(
                                   Icons.check_circle,
-                                  color: Colors.green,
+                                  color: colors.primary,
                                   size: 60,
                                 ),
 
@@ -455,9 +459,9 @@ void _showInputDialog(
                                 const SizedBox(height: 20),
                               ],
                             ),
+                            btnOkColor: colors.primary,
 
                             btnOkOnPress: () {
-                              Get.back();
                               Get.back();
                             },
                           ).show();

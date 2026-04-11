@@ -393,7 +393,6 @@ class LoginPage extends StatelessWidget {
                           child: IconButton(
                             onPressed: () {
                               authC.loginWithGoogle();
-                              print("baok");
                             },
                             icon: Image.network(
                               'https://cdn-icons-png.flaticon.com/512/281/281764.png',

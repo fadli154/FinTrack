@@ -45,6 +45,15 @@ class HomeController extends GetxController {
     listenCategories();
   }
 
+  Future<void> deleteTransaction(String id) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('transactions ')
+        .doc(id)
+        .delete();
+  }
+
   IconData getIconFromString(String? iconName) {
     final Map<String, IconData> iconMap = {
       'work': Icons.work,

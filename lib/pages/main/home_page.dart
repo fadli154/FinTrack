@@ -1,3 +1,4 @@
+import 'package:fintrack/controllers/add_controller.dart';
 import 'package:fintrack/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -65,90 +66,99 @@ class MyHomePage extends StatelessWidget {
                   final categoryId = data['category'];
                   final categoryData = controller.categoryMap[categoryId];
                   final categoryName = categoryData?['name'] ?? 'Other';
+                  final note = data['note'];
+
+                  final displayText =
+                      (note != null && note.toString().trim().isNotEmpty)
+                      ? note
+                      : categoryName;
 
                   final iconName = categoryData?['icon'] ?? 'attach_money';
                   final colorHex = categoryData?['color'] ?? '#9E9E9E';
                   final isIncome = categoryData?['type'] == 'pemasukan';
                   final amount = (data['amount'] as num?) ?? 0;
 
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: colors.secondary.withAlpha(50),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: colors.tertiary.withValues(alpha: .1),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: controller.getColorFromHex(colorHex),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            controller.getIconFromString(iconName),
-                            color: Colors.white.withValues(alpha: 0.7),
-                            size: 18,
-                          ),
+                  return GestureDetector(
+                    onTap: () {
+                      _showDetailDialog(context, data, categoryData);
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: colors.secondary.withAlpha(50),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: colors.tertiary.withValues(alpha: .1),
                         ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: controller.getColorFromHex(colorHex),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              controller.getIconFromString(iconName),
+                              color: Colors.white.withValues(alpha: 0.7),
+                              size: 18,
+                            ),
+                          ),
 
-                        const SizedBox(width: 12),
+                          const SizedBox(width: 12),
 
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // 🔥 TITLE TRANSAKSI (note user)
-                              Text(
-                                controller.capitalizeEachWord(categoryName),
-                                style: GoogleFonts.poppins(
-                                  textStyle: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: colors.tertiary.withValues(
-                                      alpha: 0.6,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              const SizedBox(height: 3),
-
-                              Tooltip(
-                                message: data['note'] ?? '',
-                                child: Text(
-                                  controller.capitalizeEachWord(
-                                    data['note'] ?? '',
-                                  ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // 🔥 TITLE TRANSAKSI (note user)
+                                Text(
+                                  controller.capitalizeEachWord(categoryName),
                                   style: GoogleFonts.poppins(
                                     textStyle: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
                                       color: colors.tertiary.withValues(
-                                        alpha: 0.4,
+                                        alpha: 0.6,
                                       ),
                                     ),
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
 
-                        Text(
-                          "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern('id').format(amount)}",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: colors.tertiary.withValues(alpha: 0.5),
+                                const SizedBox(height: 3),
+
+                                Tooltip(
+                                  message: displayText,
+                                  child: Text(
+                                    controller.capitalizeEachWord(displayText),
+                                    style: GoogleFonts.poppins(
+                                      textStyle: TextStyle(
+                                        fontSize: 12,
+                                        color: colors.tertiary.withValues(
+                                          alpha: 0.4,
+                                        ),
+                                      ),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+
+                          Text(
+                            "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern('id').format(amount)}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color: colors.tertiary.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 }),
@@ -157,6 +167,187 @@ class MyHomePage extends StatelessWidget {
           },
         );
       },
+    );
+  }
+
+  void _showDetailDialog(
+    BuildContext context,
+    Map<String, dynamic> data,
+    Map<String, dynamic>? categoryData,
+  ) {
+    final colors = Theme.of(context).colorScheme;
+    final controller = Get.find<HomeController>();
+
+    final categoryName = categoryData?['name'] ?? 'Other';
+    final note = data['note'] ?? '-';
+    final amount = data['amount'] ?? 0;
+    final iconName = categoryData?['icon'] ?? 'attach_money';
+    final colorHex = categoryData?['color'] ?? '#9E9E9E';
+    final isIncome = categoryData?['type'] == 'pemasukan';
+
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: colors.secondary,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // HANDLE
+            Container(
+              width: 40,
+              height: 5,
+              margin: const EdgeInsets.only(bottom: 15),
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+
+            // ICON
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: controller.getColorFromHex(colorHex),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                controller.getIconFromString(iconName),
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            // CATEGORY
+            Text(
+              controller.capitalizeEachWord(categoryName),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: colors.tertiary,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            // NOTE
+            Text(
+              controller.capitalizeEachWord(note),
+              style: TextStyle(
+                fontSize: 14,
+                color: colors.tertiary.withValues(alpha: 0.6),
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            // AMOUNT
+            Text(
+              "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern('id').format(amount)}",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: colors.primary,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // BUTTONS
+            Row(
+              children: [
+                // EDIT
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Get.back();
+                      _showEditDialog(context, data);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: colors.primary),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      "Edit",
+                      style: TextStyle(color: colors.primary),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 10),
+
+                // DELETE
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await controller.deleteTransaction(data['id']);
+                      Get.back();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text("Hapus"),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  void _showEditDialog(BuildContext context, Map<String, dynamic> data) {
+    final colors = Theme.of(context).colorScheme;
+    final controller = Get.put(AddController());
+
+    final amountC = TextEditingController(text: data['amount'].toString());
+    final noteC = TextEditingController(text: data['note']);
+
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colors.secondary,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Edit Transaksi", style: TextStyle(fontSize: 16)),
+
+            const SizedBox(height: 15),
+
+            TextField(controller: amountC),
+            const SizedBox(height: 10),
+            TextField(controller: noteC),
+
+            const SizedBox(height: 20),
+
+            ElevatedButton(
+              onPressed: () async {
+                await controller.updateTransaction(
+                  id: data['id'],
+                  amount: int.parse(amountC.text),
+                  note: noteC.text,
+                );
+                Get.back();
+              },
+              child: const Text("Update"),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

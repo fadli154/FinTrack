@@ -13,6 +13,19 @@ class AddController extends GetxController {
         .snapshots();
   }
 
+  Future<void> updateTransaction({
+    required String id,
+    required int amount,
+    required String note,
+  }) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('transactions ')
+        .doc(id)
+        .update({'amount': amount, 'note': note});
+  }
+
   // 🔥 simpan transaksi
   Future<void> addTransaction({
     required String categoryId,
