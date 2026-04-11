@@ -21,8 +21,8 @@ class AddController extends GetxController {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('transactions ')
-        .doc(id)
+        .collection('transactions ') // ✅ sudah diperbaiki
+        .doc(id) // ✅ pakai docId asli
         .update({'amount': amount, 'note': note});
   }
 
@@ -40,6 +40,7 @@ class AddController extends GetxController {
         .doc(user!.uid)
         .collection('transactions ')
         .add({
+          'id': DateTime.now().millisecondsSinceEpoch.toString(),
           'category': categoryId,
           'amount': amount,
           'note': note,

@@ -1,5 +1,6 @@
 import 'package:fintrack/controllers/add_controller.dart';
 import 'package:fintrack/controllers/home_controller.dart';
+import 'package:fintrack/services/currency_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -62,7 +63,9 @@ class MyHomePage extends StatelessWidget {
                   ),
                 ),
 
-                ...items.map((data) {
+                ...items.map((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  final docId = doc.id; // 🔥 ini kunci utama
                   final categoryId = data['category'];
                   final categoryData = controller.categoryMap[categoryId];
                   final categoryName = categoryData?['name'] ?? 'Other';
@@ -80,7 +83,7 @@ class MyHomePage extends StatelessWidget {
 
                   return GestureDetector(
                     onTap: () {
-                      _showDetailDialog(context, data, categoryData);
+                      _showDetailDialog(context, data, categoryData, docId);
                     },
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 10),
@@ -174,6 +177,7 @@ class MyHomePage extends StatelessWidget {
     BuildContext context,
     Map<String, dynamic> data,
     Map<String, dynamic>? categoryData,
+    String docId,
   ) {
     final colors = Theme.of(context).colorScheme;
     final controller = Get.find<HomeController>();
@@ -251,7 +255,7 @@ class MyHomePage extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: colors.primary,
+                color: colors.tertiary,
               ),
             ),
 
@@ -265,17 +269,17 @@ class MyHomePage extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: () {
                       Get.back();
-                      _showEditDialog(context, data);
+                      _showEditDialog(context, data, docId);
                     },
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: colors.primary),
+                      side: BorderSide(color: colors.tertiary),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: Text(
                       "Edit",
-                      style: TextStyle(color: colors.primary),
+                      style: TextStyle(color: colors.tertiary),
                     ),
                   ),
                 ),
@@ -286,7 +290,7 @@ class MyHomePage extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () async {
-                      await controller.deleteTransaction(data['id']);
+                      await controller.deleteTransaction(docId);
                       Get.back();
                     },
                     style: ElevatedButton.styleFrom(
@@ -295,7 +299,10 @@ class MyHomePage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text("Hapus"),
+                    child: Text(
+                      "Hapus",
+                      style: TextStyle(color: colors.inverseSurface),
+                    ),
                   ),
                 ),
               ],
@@ -307,7 +314,11 @@ class MyHomePage extends StatelessWidget {
     );
   }
 
-  void _showEditDialog(BuildContext context, Map<String, dynamic> data) {
+  void _showEditDialog(
+    BuildContext context,
+    Map<String, dynamic> data, [
+    docId,
+  ]) {
     final colors = Theme.of(context).colorScheme;
     final controller = Get.put(AddController());
 
@@ -315,37 +326,89 @@ class MyHomePage extends StatelessWidget {
     final noteC = TextEditingController(text: data['note']);
 
     Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: colors.secondary,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text("Edit Transaksi", style: TextStyle(fontSize: 16)),
+      FractionallySizedBox(
+        heightFactor: 0.6,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: colors.secondary,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 20),
 
-            const SizedBox(height: 15),
+              Text(
+                "Edit Transaksi",
+                style: GoogleFonts.poppins(
+                  textStyle: TextStyle(
+                    fontSize: 16,
+                    color: colors.tertiary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
 
-            TextField(controller: amountC),
-            const SizedBox(height: 10),
-            TextField(controller: noteC),
+              const SizedBox(height: 25),
 
-            const SizedBox(height: 20),
+              TextField(
+                controller: amountC,
+                keyboardType: TextInputType.number,
+                inputFormatters: [CurrencyInputFormatter()],
+                style: const TextStyle(color: Colors.black),
+                decoration: InputDecoration(
+                  label: const Text("Nominal"),
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  floatingLabelStyle: const TextStyle(color: Colors.black),
+                  hintText: "Rp 0",
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: const Color.fromARGB(217, 245, 245, 245),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+              TextField(
+                controller: noteC,
+                style: const TextStyle(color: Colors.black),
 
-            ElevatedButton(
-              onPressed: () async {
-                await controller.updateTransaction(
-                  id: data['id'],
-                  amount: int.parse(amountC.text),
-                  note: noteC.text,
-                );
-                Get.back();
-              },
-              child: const Text("Update"),
-            ),
-          ],
+                decoration: InputDecoration(
+                  hintText: "Catatan",
+                  label: const Text("Catatan"),
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  floatingLabelStyle: const TextStyle(color: Colors.black),
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: const Color.fromARGB(213, 245, 245, 245),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              ElevatedButton(
+                onPressed: () async {
+                  await controller.updateTransaction(
+                    id: docId,
+                    amount: int.parse(amountC.text),
+                    note: noteC.text,
+                  );
+                  Get.back();
+                },
+                child: Text(
+                  "Update",
+                  style: TextStyle(color: colors.inverseSurface),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

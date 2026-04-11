@@ -93,25 +93,20 @@ class HomeController extends GetxController {
         .join(' ');
   }
 
-  Map<String, List<Map<String, dynamic>>> groupByDate(
-    List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
-  ) {
-    Map<String, List<Map<String, dynamic>>> grouped = {};
+  Map<String, List<DocumentSnapshot>> groupByDate(List docs) {
+    final Map<String, List<DocumentSnapshot>> grouped = {};
 
     for (var doc in docs) {
       final data = doc.data();
+      final date = (data['date'] as Timestamp).toDate();
 
-      final timestamp = data['date'] as Timestamp?;
-      if (timestamp == null) continue;
-
-      final date = timestamp.toDate();
-      final key = DateFormat('d MMM', 'id').format(date);
+      final key = DateFormat('yyyy-MM-dd').format(date);
 
       if (!grouped.containsKey(key)) {
         grouped[key] = [];
       }
 
-      grouped[key]!.add(data);
+      grouped[key]!.add(doc); // ✅ simpan doc, bukan data
     }
 
     return grouped;
