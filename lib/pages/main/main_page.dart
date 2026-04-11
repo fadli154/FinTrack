@@ -413,29 +413,17 @@ void _showInputDialog(
                           );
                           Get.back();
                           Get.back();
-                          // 🎉 Alert
                           AwesomeDialog(
                             context: Get.overlayContext!,
-                            dialogType: DialogType
-                                .noHeader, // 🔥 disable default header
-                            animType: AnimType.topSlide,
-
+                            dialogType: DialogType.success,
+                            animType: AnimType.scale,
                             dialogBackgroundColor: colors.secondary,
-                            barrierColor: colors.shadow.withValues(alpha: 0.25),
+                            titleTextStyle: TextStyle(color: colors.tertiary),
+                            descTextStyle: TextStyle(color: colors.tertiary),
                             dismissOnTouchOutside: false,
 
                             body: Column(
                               children: [
-                                const SizedBox(height: 10),
-
-                                Icon(
-                                  Icons.check_circle,
-                                  color: colors.primary,
-                                  size: 60,
-                                ),
-
-                                const SizedBox(height: 10),
-
                                 Text(
                                   "Berhasil!",
                                   style: TextStyle(
@@ -461,8 +449,20 @@ void _showInputDialog(
                             ),
                             btnOkColor: colors.primary,
 
-                            btnOkOnPress: () {
-                              Get.back();
+                            btnOkOnPress: () async {
+                              try {
+                                Get.back();
+
+                                showSnack(
+                                  title: "Sukses",
+                                  message: "Transaksi berhasil ditambahkan",
+                                );
+                              } catch (e) {
+                                showSnack(
+                                  title: "Error",
+                                  message: e.toString(),
+                                );
+                              }
                             },
                           ).show();
                         }
@@ -484,5 +484,27 @@ void _showInputDialog(
       ),
     ),
     isScrollControlled: true,
+  );
+}
+
+void showSnack({
+  required String title,
+  required String message,
+  bool isError = false,
+}) {
+  Get.snackbar(
+    title,
+    message,
+    snackPosition: SnackPosition.BOTTOM,
+    margin: const EdgeInsets.fromLTRB(15, 15, 15, 110),
+    borderRadius: 12,
+    backgroundColor: isError ? Colors.red.shade400 : Colors.teal,
+    colorText: Colors.white,
+    icon: Icon(isError ? Icons.error : Icons.check_circle, color: Colors.white),
+    duration: const Duration(seconds: 3),
+    mainButton: TextButton(
+      onPressed: () => Get.back(),
+      child: const Text("Tutup", style: TextStyle(color: Colors.white)),
+    ),
   );
 }

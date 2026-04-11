@@ -304,6 +304,19 @@ class MyHomePage extends StatelessWidget {
                         desc: 'Yakin mau hapus transaksi ini?',
                         btnCancelOnPress: () {},
                         btnCancelColor: colors.primary,
+                        btnCancel: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            side: BorderSide(color: colors.tertiary),
+                          ),
+                          onPressed: () => Get.back(),
+                          child: Text(
+                            "Batal",
+                            style: TextStyle(color: colors.tertiary),
+                          ),
+                        ),
                         btnOkText: "Hapus",
                         btnOkColor: Colors.red,
                         btnOkOnPress: () async {
@@ -311,12 +324,12 @@ class MyHomePage extends StatelessWidget {
                             await controller.deleteTransaction(docId);
                             Get.back();
 
-                            Get.snackbar(
-                              "Sukses",
-                              "Transaksi berhasil dihapus",
+                            showSnack(
+                              title: "Sukses",
+                              message: "Transaksi berhasil dihapus",
                             );
                           } catch (e) {
-                            Get.snackbar("Error", e.toString());
+                            showSnack(title: "Error", message: e.toString());
                           }
                         },
                       ).show();
@@ -470,4 +483,26 @@ class MyHomePage extends StatelessWidget {
       ),
     );
   }
+}
+
+void showSnack({
+  required String title,
+  required String message,
+  bool isError = false,
+}) {
+  Get.snackbar(
+    title,
+    message,
+    snackPosition: SnackPosition.BOTTOM,
+    margin: const EdgeInsets.fromLTRB(15, 15, 15, 110),
+    borderRadius: 12,
+    backgroundColor: isError ? Colors.red.shade400 : Colors.teal,
+    colorText: Colors.white,
+    icon: Icon(isError ? Icons.error : Icons.check_circle, color: Colors.white),
+    duration: const Duration(seconds: 3),
+    mainButton: TextButton(
+      onPressed: () => Get.back(),
+      child: const Text("Tutup", style: TextStyle(color: Colors.white)),
+    ),
+  );
 }
