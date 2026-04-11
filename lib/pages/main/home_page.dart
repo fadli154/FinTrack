@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:fintrack/controllers/add_controller.dart';
 import 'package:fintrack/controllers/home_controller.dart';
 import 'package:fintrack/services/currency_input_formatter.dart';
@@ -289,9 +290,36 @@ class MyHomePage extends StatelessWidget {
                 // DELETE
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () async {
-                      await controller.deleteTransaction(docId);
-                      Get.back();
+                    onPressed: () {
+                      AwesomeDialog(
+                        context: context,
+
+                        dialogType: DialogType.warning,
+                        animType: AnimType.scale,
+                        dialogBackgroundColor: colors.secondary,
+                        titleTextStyle: TextStyle(color: colors.tertiary),
+                        descTextStyle: TextStyle(color: colors.tertiary),
+
+                        title: 'Hapus Transaksi',
+                        desc: 'Yakin mau hapus transaksi ini?',
+                        btnCancelOnPress: () {},
+                        btnCancelColor: colors.primary,
+                        btnOkText: "Hapus",
+                        btnOkColor: Colors.red,
+                        btnOkOnPress: () async {
+                          try {
+                            await controller.deleteTransaction(docId);
+                            Get.back();
+
+                            Get.snackbar(
+                              "Sukses",
+                              "Transaksi berhasil dihapus",
+                            );
+                          } catch (e) {
+                            Get.snackbar("Error", e.toString());
+                          }
+                        },
+                      ).show();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
@@ -358,9 +386,7 @@ class MyHomePage extends StatelessWidget {
                 inputFormatters: [CurrencyInputFormatter()],
                 style: const TextStyle(color: Colors.black),
                 decoration: InputDecoration(
-                  label: const Text("Nominal"),
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                  floatingLabelStyle: const TextStyle(color: Colors.black),
+                  labelStyle: TextStyle(color: colors.tertiary),
                   hintText: "Rp 0",
                   hintStyle: const TextStyle(color: Colors.grey),
                   filled: true,
@@ -377,10 +403,6 @@ class MyHomePage extends StatelessWidget {
                 style: const TextStyle(color: Colors.black),
 
                 decoration: InputDecoration(
-                  hintText: "Catatan",
-                  label: const Text("Catatan"),
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                  floatingLabelStyle: const TextStyle(color: Colors.black),
                   hintStyle: const TextStyle(color: Colors.grey),
                   filled: true,
                   fillColor: const Color.fromARGB(213, 245, 245, 245),
