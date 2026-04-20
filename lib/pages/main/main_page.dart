@@ -569,9 +569,36 @@ void _showAddCategoryDialog(BuildContext context, String type) {
 
             TextField(
               controller: nameC,
-              decoration: const InputDecoration(hintText: "Nama kategori"),
-            ),
+              style: TextStyle(color: colors.tertiary), // 🔥 warna teks
+              cursorColor: colors.tertiary,
+              decoration: InputDecoration(
+                hintText: "Nama kategori",
+                hintStyle: TextStyle(color: colors.tertiary),
 
+                filled: true,
+                fillColor: colors.secondary,
+
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: colors.tertiary),
+                ),
+
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: colors.tertiary, width: 1.5),
+                ),
+              ),
+            ),
             const Spacer(),
 
             ElevatedButton(
@@ -592,7 +619,10 @@ void _showAddCategoryDialog(BuildContext context, String type) {
                   message: "Kategori berhasil ditambahkan",
                 );
               },
-              child: const Text("Simpan"),
+              child: Text(
+                "Simpan",
+                style: TextStyle(color: colors.inverseSurface),
+              ),
             ),
           ],
         ),
