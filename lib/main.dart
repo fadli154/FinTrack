@@ -1,8 +1,11 @@
 import 'package:fintrack/bindings/auth_binding.dart';
+import 'package:fintrack/bindings/home_binding.dart';
+import 'package:fintrack/controllers/home_controller.dart';
 import 'package:fintrack/pages/auth/login_page.dart';
 import 'package:fintrack/pages/auth/register_page.dart';
 import 'package:fintrack/pages/init_page.dart';
 import 'package:fintrack/pages/introduction_page.dart';
+import 'package:fintrack/pages/main/laporan_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +20,8 @@ void main() async {
   await Firebase.initializeApp();
 
   WidgetsFlutterBinding.ensureInitialized();
+
+  Get.put(HomeController(), permanent: true);
 
   await initializeDateFormatting('id', null); // 🔥 WAJIB
   runApp(MyApp());
@@ -92,6 +97,11 @@ class MyApp extends StatelessWidget {
           bindings: [PageBinding(), AuthBinding()],
         ),
         GetPage(name: '/intro', page: () => IntroductionPage()),
+        GetPage(
+          name: '/laporan',
+          page: () => LaporanPage(),
+          bindings: [HomeBinding()],
+        ),
       ],
     );
   }

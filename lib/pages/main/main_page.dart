@@ -13,6 +13,8 @@ import 'package:fintrack/pages/main/account_page.dart';
 import 'package:fintrack/pages/main/home_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:math';
 
 class MyMainPage extends StatelessWidget {
   final String title;
@@ -203,7 +205,7 @@ Widget _buildCategoryGrid(String type, BuildContext context) {
       final docs = snapshot.data?.docs ?? [];
 
       return GridView.builder(
-        itemCount: docs.length,
+        itemCount: docs.length + 1,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 4,
           mainAxisSpacing: 15,
@@ -211,6 +213,33 @@ Widget _buildCategoryGrid(String type, BuildContext context) {
           childAspectRatio: 0.8,
         ),
         itemBuilder: (context, index) {
+          // 🔥 kalau index terakhir → tombol tambah
+          if (index == docs.length) {
+            return GestureDetector(
+              onTap: () {
+                _showAddCategoryDialog(context, type);
+              },
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: colors.primary.withAlpha(150),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.add, color: Colors.white, size: 26),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    "Tambah",
+                    style: TextStyle(fontSize: 11, color: colors.tertiary),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          // 🔥 item normal (kategori)
           final doc = docs[index];
           final data = doc.data();
 
@@ -507,4 +536,73 @@ void showSnack({
       child: const Text("Tutup", style: TextStyle(color: Colors.white)),
     ),
   );
+}
+
+void _showAddCategoryDialog(BuildContext context, String type) {
+  final colors = Theme.of(context).colorScheme;
+
+  final nameC = TextEditingController();
+
+  Get.bottomSheet(
+    FractionallySizedBox(
+      heightFactor: 0.4,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colors.secondary, // 🔥 fix warna (tadi salah pakai tertiary)
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+
+            Text(
+              "Tambah Kategori",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: colors.tertiary,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            TextField(
+              controller: nameC,
+              decoration: const InputDecoration(hintText: "Nama kategori"),
+            ),
+
+            const Spacer(),
+
+            ElevatedButton(
+              onPressed: () async {
+                final randomColor = getRandomColorHex();
+
+                await FirebaseFirestore.instance.collection('categories').add({
+                  'name': nameC.text,
+                  'icon': 'category', // 🔥 default icon
+                  'color': randomColor, // 🔥 random warna
+                  'type': type,
+                });
+
+                Get.back();
+
+                showSnack(
+                  title: "Sukses",
+                  message: "Kategori berhasil ditambahkan",
+                );
+              },
+              child: const Text("Simpan"),
+            ),
+          ],
+        ),
+      ),
+    ),
+    isScrollControlled: true,
+  );
+}
+
+String getRandomColorHex() {
+  final random = Random();
+  return '#${(random.nextInt(0xFFFFFF)).toRadixString(16).padLeft(6, '0')}';
 }

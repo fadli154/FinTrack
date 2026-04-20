@@ -67,16 +67,18 @@ class ChartPage extends StatelessWidget {
           const SizedBox(height: 20),
 
           // 🔥 LEGEND
-          _legendItem("Makanan", Colors.red),
-          _legendItem("Transport", Colors.blue),
-          _legendItem("Belanja", Colors.green),
-          _legendItem("Lainnya", Colors.orange),
+          _legendItem("Makanan", Colors.red, context),
+          _legendItem("Transport", Colors.blue, context),
+          _legendItem("Belanja", Colors.green, context),
+          _legendItem("Lainnya", Colors.orange, context),
         ],
       ),
     );
   }
 
-  Widget _legendItem(String title, Color color) {
+  Widget _legendItem(String title, Color color, BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -87,7 +89,7 @@ class ChartPage extends StatelessWidget {
             decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 8),
-          Text(title),
+          Text(title, style: TextStyle(color: colors.tertiary)),
         ],
       ),
     );
