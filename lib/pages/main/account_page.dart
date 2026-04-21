@@ -126,15 +126,31 @@ class MyAccountPage extends StatelessWidget {
                         ),
                         _divider(context),
                         Obx(
-                          () => SwitchListTile(
+                          () => ListTile(
+                            leading: Icon(
+                              themeController.isDark.value
+                                  ? Icons.nightlight_round
+                                  : Icons.wb_sunny,
+                            ),
+
                             title: Text(
                               "Dark Mode",
                               style: TextStyle(color: colors.inverseSurface),
                             ),
-                            value: themeController.isDark.value,
-                            onChanged: (_) {
-                              themeController.toggleTheme();
-                            },
+
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const SizedBox(width: 8),
+
+                                Switch(
+                                  value: themeController.isDark.value,
+                                  onChanged: (_) {
+                                    themeController.toggleTheme();
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
