@@ -21,8 +21,8 @@ class AddController extends GetxController {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('transactions ') // ✅ sudah diperbaiki
-        .doc(id) // ✅ pakai docId asli
+        .collection('transactions ')
+        .doc(id)
         .update({'amount': amount, 'note': note});
   }
 

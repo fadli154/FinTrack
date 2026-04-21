@@ -1,108 +1,107 @@
 import 'package:fintrack/controllers/auth_controller.dart';
-import 'package:fintrack/controllers/thme_controller.dart';
+import 'package:fintrack/controllers/home_controller.dart';
+import 'package:fintrack/controllers/page_controller.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class MyDrawer extends StatelessWidget {
-  MyDrawer({super.key, required this.colors, required this.themeController});
-
-  final ColorScheme colors;
-  final ThemeController themeController;
-
-  final authC = Get.find<AuthController>();
+class TopDrawerContent extends StatelessWidget {
+  const TopDrawerContent({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      backgroundColor: colors.secondary,
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 50, 16, 20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [colors.primary, colors.primary.withValues(alpha: .7)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.person, color: colors.primary),
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Welcome 👋",
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
-                    ),
-                    Text(
-                      "Fadli",
+    final colors = Theme.of(context).colorScheme;
+    final authC = Get.find<AuthController>();
+    final controller = Get.find<HomeController>();
+    final pagecontroller = Get.find<PageControllers>();
+    final user = FirebaseAuth.instance.currentUser;
+
+    final name = user?.displayName ?? user?.email?.split('@').first ?? "User";
+
+    return Material(
+      elevation: 8,
+      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(25)),
+      child: Container(
+        padding: const EdgeInsets.only(top: 10, bottom: 10),
+        decoration: BoxDecoration(
+          color: colors.secondary,
+          borderRadius: const BorderRadius.vertical(
+            bottom: Radius.circular(25),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // 🔥 penting!
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundColor: colors.primary,
+                    child: Text(
+                      name[0].toUpperCase(),
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
+                        color: colors.inverseSurface,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 10),
-
-          ListTile(
-            leading: Icon(Icons.home, color: colors.tertiary),
-            title: Text("Home", style: TextStyle(color: colors.tertiary)),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-
-          ListTile(
-            leading: Icon(Icons.person, color: colors.tertiary),
-            title: Text("Profile", style: TextStyle(color: colors.tertiary)),
-            onTap: () {},
-          ),
-
-          ListTile(
-            leading: Icon(Icons.settings, color: colors.tertiary),
-            title: Text("Settings", style: TextStyle(color: colors.tertiary)),
-            onTap: () {},
-          ),
-
-          Obx(
-            () => SwitchListTile(
-              title: Text(
-                "Dark Mode",
-                style: TextStyle(color: colors.tertiary),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      name,
+                      style: TextStyle(
+                        color: colors.tertiary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
-              secondary: Icon(Icons.dark_mode, color: colors.tertiary),
-              value: themeController.isDark.value,
-              onChanged: (value) {
-                themeController.toggleTheme();
-              },
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5.0),
+              child: ListTile(
+                leading: Icon(Icons.home, color: colors.tertiary),
+                title: Text("Home", style: TextStyle(color: colors.tertiary)),
+                onTap: controller.closeDrawer,
+              ),
+            ),
 
-          ListTile(
-            leading: const Icon(Icons.logout_sharp, color: Colors.redAccent),
-            title: const Text(
-              "Logout",
-              style: TextStyle(color: Colors.redAccent),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5.0),
+
+              child: ListTile(
+                leading: Icon(Icons.person, color: colors.tertiary),
+                title: Text(
+                  "Profile",
+                  style: TextStyle(color: colors.tertiary),
+                ),
+                onTap: () {
+                  pagecontroller.changePage(4); // index profile
+                  controller.closeDrawer();
+                },
+              ),
             ),
-            onTap: () {
-              authC.logout();
-            },
-          ),
-        ],
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6.0),
+
+              child: ListTile(
+                leading: const Icon(Icons.logout, color: Colors.red),
+                title: const Text(
+                  "Logout",
+                  style: TextStyle(color: Colors.red),
+                ),
+                onTap: authC.logout,
+              ),
+            ),
+
+            SizedBox(height: 10),
+          ],
+        ),
       ),
     );
   }

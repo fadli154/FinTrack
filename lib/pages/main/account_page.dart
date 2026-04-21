@@ -1,4 +1,7 @@
+import 'package:fintrack/controllers/thme_controller.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MyAccountPage extends StatelessWidget {
@@ -9,8 +12,12 @@ class MyAccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final themeController = Get.find<ThemeController>();
+    final user = FirebaseAuth.instance.currentUser;
+    final displayName = user?.displayName ?? "User";
 
     return Scaffold(
+      appBar: AppBar(toolbarHeight: 3, backgroundColor: colors.secondary),
       body: SafeArea(
         child: Column(
           children: [
@@ -45,7 +52,7 @@ class MyAccountPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Fadli",
+                        displayName,
                         style: GoogleFonts.poppins(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -53,7 +60,7 @@ class MyAccountPage extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "Masuk, lebih seru!",
+                        "Hai, selamat datang di FinTrack!",
                         style: TextStyle(color: Colors.grey),
                       ),
                     ],
@@ -118,6 +125,18 @@ class MyAccountPage extends StatelessWidget {
                           title: "Pengaturan",
                         ),
                         _divider(context),
+                        Obx(
+                          () => SwitchListTile(
+                            title: Text(
+                              "Dark Mode",
+                              style: TextStyle(color: colors.inverseSurface),
+                            ),
+                            value: themeController.isDark.value,
+                            onChanged: (_) {
+                              themeController.toggleTheme();
+                            },
+                          ),
+                        ),
                       ],
                     ),
                   ),

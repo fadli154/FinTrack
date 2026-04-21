@@ -1,7 +1,9 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:fintrack/controllers/add_controller.dart';
 import 'package:fintrack/controllers/home_controller.dart';
+import 'package:fintrack/partials/my_drawer.dart';
 import 'package:fintrack/services/currency_input_formatter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,158 +17,248 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final controller = Get.put(HomeController());
 
-    if (controller.user == null) {
-      return const Center(child: Text("User belum login"));
-    }
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: Colors.white),
+          onPressed: () {
+            Get.find<HomeController>().toggleDrawer();
+          },
+        ),
+      ),
+      body: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewPadding.bottom,
+        ),
+        child: Stack(
+          children: [
+            _buildContent(colors),
 
+            // 🔥 DRAWER ONLY
+            Obx(() {
+              final controller = Get.find<HomeController>();
+
+              return Stack(
+                children: [
+                  if (controller.isTopDrawerOpen.value)
+                    GestureDetector(
+                      onTap: controller.closeDrawer,
+                      child: Container(
+                        color: Colors.black.withValues(alpha: 0.2),
+                      ),
+                    ),
+
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                    top: controller.isTopDrawerOpen.value ? 0 : -300,
+                    left: 0,
+                    right: 0,
+                    child: const TopDrawerContent(),
+                  ),
+                ],
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent(ColorScheme colors) {
     return StreamBuilder(
-      stream: controller.transaksiStream,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Center(child: Text("Error: ${snapshot.error}"));
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, authSnapshot) {
+        // ⏳ loading auth
+        if (authSnapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final docs = snapshot.data?.docs ?? [];
-
-        if (docs.isEmpty) {
-          return _emptyState(colors);
+        // ❌ belum login
+        if (!authSnapshot.hasData) {
+          return const Center(child: Text("User belum login"));
         }
 
-        final groupedData = controller.groupByDate(docs);
-        final keys = groupedData.keys.toList();
+        // ✅ sudah login → baru ambil controller
+        final controller = Get.find<HomeController>();
 
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: keys.length,
-          itemBuilder: (context, index) {
-            final dateKey = keys[index];
-            final items = groupedData[dateKey]!;
+        return StreamBuilder(
+          stream: controller.transaksiStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(child: Text("Error: ${snapshot.error}"));
+            }
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // HEADER TANGGAL
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    dateKey,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: colors.tertiary,
-                    ),
-                  ),
-                ),
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-                ...items.map((doc) {
-                  final data = doc.data() as Map<String, dynamic>;
-                  final docId = doc.id; // 🔥 ini kunci utama
-                  final categoryId = data['category'];
-                  final categoryData = controller.categoryMap[categoryId];
-                  final categoryName = categoryData?['name'] ?? 'Other';
-                  final note = data['note'];
+            final docs = snapshot.data?.docs ?? [];
 
-                  final displayText =
-                      (note != null && note.toString().trim().isNotEmpty)
-                      ? note
-                      : categoryName;
+            if (docs.isEmpty) {
+              return _emptyState(colors);
+            }
 
-                  final iconName = categoryData?['icon'] ?? 'attach_money';
-                  final colorHex = categoryData?['color'] ?? '#9E9E9E';
-                  final isIncome = categoryData?['type'] == 'pemasukan';
-                  final amount = (data['amount'] as num?) ?? 0;
+            final groupedData = controller.groupByDate(docs);
+            final totals = controller.sumIncomeByDate(groupedData);
+            final keys = groupedData.keys.toList();
 
-                  return GestureDetector(
-                    onTap: () {
-                      _showDetailDialog(context, data, categoryData, docId);
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: colors.secondary.withAlpha(50),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: colors.tertiary.withValues(alpha: .1),
-                        ),
-                      ),
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: keys.length,
+              itemBuilder: (context, index) {
+                final dateKey = keys[index];
+                final items = groupedData[dateKey]!;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // HEADER TANGGAL
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: controller.getColorFromHex(colorHex),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              controller.getIconFromString(iconName),
-                              color: Colors.white.withValues(alpha: 0.7),
-                              size: 18,
-                            ),
-                          ),
-
-                          const SizedBox(width: 12),
-
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // 🔥 TITLE TRANSAKSI (note user)
-                                Text(
-                                  controller.capitalizeEachWord(categoryName),
-                                  style: GoogleFonts.poppins(
-                                    textStyle: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: colors.tertiary.withValues(
-                                        alpha: 0.6,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                const SizedBox(height: 3),
-
-                                Tooltip(
-                                  message: displayText,
-                                  child: Text(
-                                    controller.capitalizeEachWord(displayText),
-                                    style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(
-                                        fontSize: 12,
-                                        color: colors.tertiary.withValues(
-                                          alpha: 0.4,
-                                        ),
-                                      ),
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
                           Text(
-                            "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern('id').format(amount)}",
+                            dateKey,
                             style: TextStyle(
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: colors.tertiary.withValues(alpha: 0.5),
+                              color: colors.tertiary,
+                            ),
+                          ),
+                          Text(
+                            "Pemasukan: Rp ${NumberFormat.decimalPattern('id').format(totals[dateKey] ?? 0)}",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  );
-                }),
-              ],
+
+                    ...items.map((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      final docId = doc.id; // 🔥 ini kunci utama
+                      final categoryId = data['category'];
+                      final categoryData = controller.categoryMap[categoryId];
+                      final categoryName = categoryData?['name'] ?? 'Other';
+                      final note = data['note'];
+
+                      final displayText =
+                          (note != null && note.toString().trim().isNotEmpty)
+                          ? note
+                          : categoryName;
+
+                      final iconName = categoryData?['icon'] ?? 'attach_money';
+                      final colorHex = categoryData?['color'] ?? '#9E9E9E';
+                      final isIncome = categoryData?['type'] == 'pemasukan';
+                      final amount = (data['amount'] as num?) ?? 0;
+
+                      return GestureDetector(
+                        onTap: () {
+                          _showDetailDialog(context, data, categoryData, docId);
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: colors.secondary.withAlpha(50),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: colors.tertiary.withValues(alpha: .1),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: controller.getColorFromHex(colorHex),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  controller.getIconFromString(iconName),
+                                  color: Colors.white.withValues(alpha: 0.7),
+                                  size: 18,
+                                ),
+                              ),
+
+                              const SizedBox(width: 12),
+
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // 🔥 TITLE TRANSAKSI (note user)
+                                    Text(
+                                      controller.capitalizeEachWord(
+                                        categoryName,
+                                      ),
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: colors.tertiary.withValues(
+                                            alpha: 0.6,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 3),
+
+                                    Tooltip(
+                                      message: displayText,
+                                      child: Text(
+                                        controller.capitalizeEachWord(
+                                          displayText,
+                                        ),
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                            fontSize: 12,
+                                            color: colors.tertiary.withValues(
+                                              alpha: 0.4,
+                                            ),
+                                          ),
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              Text(
+                                "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern('id').format(amount)}",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: colors.tertiary.withValues(alpha: 0.5),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                );
+              },
             );
           },
         );

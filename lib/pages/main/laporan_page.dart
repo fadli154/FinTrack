@@ -11,95 +11,103 @@ class LaporanPage extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final controller = Get.put(LaporanController());
 
-    return StreamBuilder(
-      stream: controller.transaksiStream,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Center(child: Text("Error: ${snapshot.error}"));
-        }
+    return Scaffold(
+      appBar: AppBar(toolbarHeight: 3, backgroundColor: colors.secondary),
+      body: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewPadding.bottom,
+        ),
+        child: StreamBuilder(
+          stream: controller.transaksiStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(child: Text("Error: ${snapshot.error}"));
+            }
 
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-        final docs = snapshot.data!.docs;
-        controller.calculate(docs);
+            final docs = snapshot.data!.docs;
+            controller.calculate(docs);
 
-        return Obx(() {
-          final totalSaldo =
-              controller.totalIncome.value - controller.totalExpense.value;
+            return Obx(() {
+              final totalSaldo =
+                  controller.totalIncome.value - controller.totalExpense.value;
 
-          return Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                // 🔥 TOTAL SALDO
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: colors.primary,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    children: [
-                      const Text(
-                        "Total Saldo",
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Rp ${NumberFormat.decimalPattern('id').format(totalSaldo)}",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // 🔥 PEMASUKAN & PENGELUARAN
-                Row(
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
                   children: [
-                    Expanded(
-                      child: _card(
-                        "Pemasukan",
-                        controller.totalIncome.value,
-                        Colors.green,
-                        context,
+                    // 🔥 TOTAL SALDO
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: colors.primary,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        children: [
+                          const Text(
+                            "Total Saldo",
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Rp ${NumberFormat.decimalPattern('id').format(totalSaldo)}",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 12),
+
+                    const SizedBox(height: 20),
+
+                    // 🔥 PEMASUKAN & PENGELUARAN
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _card(
+                            "Pemasukan",
+                            controller.totalIncome.value,
+                            Colors.green,
+                            context,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _card(
+                            "Pengeluaran",
+                            controller.totalExpense.value,
+                            Colors.red,
+                            context,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // 🔥 SUMMARY PER KATEGORI
                     Expanded(
-                      child: _card(
-                        "Pengeluaran",
-                        controller.totalExpense.value,
-                        Colors.red,
-                        context,
+                      child: ListView(
+                        children: controller.categorySummary.entries.map((e) {
+                          return _listItem(e.key, e.value, context);
+                        }).toList(),
                       ),
                     ),
                   ],
                 ),
-
-                const SizedBox(height: 20),
-
-                // 🔥 SUMMARY PER KATEGORI
-                Expanded(
-                  child: ListView(
-                    children: controller.categorySummary.entries.map((e) {
-                      return _listItem(e.key, e.value, context);
-                    }).toList(),
-                  ),
-                ),
-              ],
-            ),
-          );
-        });
-      },
+              );
+            });
+          },
+        ),
+      ),
     );
   }
 
@@ -107,7 +115,7 @@ class LaporanPage extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       decoration: BoxDecoration(
         color: colors.secondary,
         borderRadius: BorderRadius.circular(16),
@@ -134,7 +142,7 @@ class LaporanPage extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return ListTile(
-      contentPadding: EdgeInsets.zero,
+      contentPadding: EdgeInsets.symmetric(horizontal: 6),
       title: Text(title, style: TextStyle(color: colors.tertiary)),
       trailing: Text(
         "Rp ${NumberFormat.decimalPattern('id').format(amount)}",

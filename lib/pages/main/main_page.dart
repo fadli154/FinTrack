@@ -2,7 +2,6 @@ import 'package:fintrack/controllers/add_controller.dart';
 import 'package:fintrack/controllers/home_controller.dart';
 import 'package:fintrack/pages/main/chart_page.dart';
 import 'package:fintrack/pages/main/laporan_page.dart';
-import 'package:fintrack/partials/my_drawer.dart';
 import 'package:fintrack/services/currency_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
@@ -38,23 +37,10 @@ class MyMainPage extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actionsIconTheme: const IconThemeData(color: Colors.white),
-        iconTheme: const IconThemeData(color: Colors.white),
-        centerTitle: true,
-      ),
       body: Obx(() => _pages[pageController.pageIndex.value]),
       bottomNavigationBar: Obx(
         () => ConvexAppBar(
+          controller: pageController.tabController,
           backgroundColor: colors.secondary,
           initialActiveIndex: pageController.pageIndex.value,
 
@@ -88,8 +74,6 @@ class MyMainPage extends StatelessWidget {
           },
         ),
       ),
-
-      drawer: MyDrawer(colors: colors, themeController: themeController),
     );
   }
 }

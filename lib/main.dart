@@ -1,10 +1,13 @@
 import 'package:fintrack/bindings/auth_binding.dart';
 import 'package:fintrack/bindings/home_binding.dart';
+import 'package:fintrack/bindings/theme_binding.dart';
 import 'package:fintrack/controllers/home_controller.dart';
+import 'package:fintrack/controllers/thme_controller.dart';
 import 'package:fintrack/pages/auth/login_page.dart';
 import 'package:fintrack/pages/auth/register_page.dart';
 import 'package:fintrack/pages/init_page.dart';
 import 'package:fintrack/pages/introduction_page.dart';
+import 'package:fintrack/pages/main/account_page.dart';
 import 'package:fintrack/pages/main/laporan_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -22,6 +25,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   Get.put(HomeController(), permanent: true);
+  Get.put(ThemeController(), permanent: true);
 
   await initializeDateFormatting('id', null); // 🔥 WAJIB
   runApp(MyApp());
@@ -101,6 +105,11 @@ class MyApp extends StatelessWidget {
           name: '/laporan',
           page: () => LaporanPage(),
           bindings: [HomeBinding()],
+        ),
+        GetPage(
+          name: '/profile',
+          page: () => MyAccountPage(title: 'FinTrack'),
+          bindings: [ThemeBinding()],
         ),
       ],
     );

@@ -60,59 +60,49 @@ class IntroductionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFFEEF2FF), Color(0xFFFFFFFF)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewPadding.bottom,
+      ),
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFFEEF2FF), Color(0xFFFFFFFF)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
               ),
             ),
-          ),
 
-          Positioned(
-            top: -50,
-            right: 0,
-            child: Image.asset(
-              'assets/particles/Ellipse1.png',
-              fit: BoxFit.cover, // Ensures it fills the stack area
-              width: 260,
-              height: 260,
-              color: colors.tertiary.withValues(alpha: 0.1),
-            ),
-          ),
-          Positioned(
-            top: -35,
-            right: -10,
-            child: Image.asset(
-              'assets/particles/Ellipse2.png',
-              width: 400,
-              height: 400,
-              color: colors.tertiary.withValues(alpha: 0.1),
-            ),
-          ),
-
-          Positioned(
-            bottom: -90,
-            left: -200,
-            child: IgnorePointer(
+            Positioned(
+              top: -50,
+              right: 0,
               child: Image.asset(
-                'assets/particles/Rectangle1.png',
+                'assets/particles/Ellipse1.png',
+                fit: BoxFit.cover, // Ensures it fills the stack area
+                width: 260,
+                height: 260,
+                color: colors.tertiary.withValues(alpha: 0.1),
+              ),
+            ),
+            Positioned(
+              top: -35,
+              right: -10,
+              child: Image.asset(
+                'assets/particles/Ellipse2.png',
                 width: 400,
                 height: 400,
                 color: colors.tertiary.withValues(alpha: 0.1),
               ),
             ),
-          ),
-          Positioned(
-            bottom: -90,
-            left: -200,
-            child: IgnorePointer(
-              child: Transform.rotate(
-                angle: 230,
+
+            Positioned(
+              bottom: -90,
+              left: -200,
+              child: IgnorePointer(
                 child: Image.asset(
                   'assets/particles/Rectangle1.png',
                   width: 400,
@@ -121,82 +111,97 @@ class IntroductionPage extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-          Positioned(
-            bottom: -160,
-            left: -100,
-            child: IgnorePointer(
-              child: Transform.rotate(
-                angle: 200,
-                child: Image.asset(
-                  'assets/particles/Rectangle1.png',
-                  width: 400,
-                  height: 400,
-                  color: colors.tertiary.withValues(alpha: 0.1),
+            Positioned(
+              bottom: -90,
+              left: -200,
+              child: IgnorePointer(
+                child: Transform.rotate(
+                  angle: 230,
+                  child: Image.asset(
+                    'assets/particles/Rectangle1.png',
+                    width: 400,
+                    height: 400,
+                    color: colors.tertiary.withValues(alpha: 0.1),
+                  ),
                 ),
               ),
             ),
-          ),
-
-          IntroductionScreen(
-            globalBackgroundColor: Colors.transparent,
-
-            pages: [
-              _buildPage(
-                title: "Track Your Money",
-                body:
-                    "Easily manage your income and expenses, and take full control of your financial life.",
-                lottie: 'assets/lotties/MoneyInvestment.json',
-              ),
-              _buildPage(
-                title: "Smart Financial Insights",
-                body:
-                    "Discover where your money goes and improve your habits with smart insights.",
-                lottie: 'assets/lotties/Revenue.json',
-              ),
-            ],
-
-            showSkipButton: true,
-            skip: const Text("Skip", style: TextStyle(color: Colors.black)),
-
-            next: const Icon(Icons.arrow_forward, color: Colors.black),
-
-            done: const Text(
-              "Start",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+            Positioned(
+              bottom: -160,
+              left: -100,
+              child: IgnorePointer(
+                child: Transform.rotate(
+                  angle: 200,
+                  child: Image.asset(
+                    'assets/particles/Rectangle1.png',
+                    width: 400,
+                    height: 400,
+                    color: colors.tertiary.withValues(alpha: 0.1),
+                  ),
+                ),
               ),
             ),
 
-            onDone: () async {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.setBool('onboarding_done', true);
+            IntroductionScreen(
+              globalBackgroundColor: Colors.transparent,
 
-              Get.offAllNamed('/init');
-            },
+              pages: [
+                _buildPage(
+                  title: "Track Your Money",
+                  body:
+                      "Easily manage your income and expenses, and take full control of your financial life.",
+                  lottie: 'assets/lotties/MoneyInvestment.json',
+                ),
+                _buildPage(
+                  title: "Smart Financial Insights",
+                  body:
+                      "Discover where your money goes and improve your habits with smart insights.",
+                  lottie: 'assets/lotties/Revenue.json',
+                ),
+              ],
 
-            onSkip: () async {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.setBool('onboarding_done', true);
+              showSkipButton: true,
+              skip: const Text("Skip", style: TextStyle(color: Colors.black)),
 
-              Get.offAllNamed('/init');
-            },
+              next: const Icon(Icons.arrow_forward, color: Colors.black),
 
-            dotsDecorator: DotsDecorator(
-              size: const Size(8, 8),
-              activeSize: const Size(20, 8),
-              activeColor: Colors.black,
-              color: Colors.grey.shade300,
-              spacing: const EdgeInsets.symmetric(horizontal: 4),
-              activeShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+              done: const Text(
+                "Start",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
-            ),
 
-            curve: Curves.easeInOut,
-          ),
-        ],
+              onDone: () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool('onboarding_done', true);
+
+                Get.offAllNamed('/init');
+              },
+
+              onSkip: () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool('onboarding_done', true);
+
+                Get.offAllNamed('/init');
+              },
+
+              dotsDecorator: DotsDecorator(
+                size: const Size(8, 8),
+                activeSize: const Size(20, 8),
+                activeColor: Colors.black,
+                color: Colors.grey.shade300,
+                spacing: const EdgeInsets.symmetric(horizontal: 4),
+                activeShape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+
+              curve: Curves.easeInOut,
+            ),
+          ],
+        ),
       ),
     );
   }

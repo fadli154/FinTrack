@@ -8,70 +8,75 @@ class ChartPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Pengeluaran",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: colors.tertiary,
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // 🔥 CARD CHART
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: colors.secondary,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: SizedBox(
-              height: 220,
-              child: PieChart(
-                PieChartData(
-                  sectionsSpace: 3,
-                  centerSpaceRadius: 40,
-                  sections: [
-                    PieChartSectionData(
-                      value: 40,
-                      color: Colors.red,
-                      title: "40%",
-                    ),
-                    PieChartSectionData(
-                      value: 30,
-                      color: Colors.blue,
-                      title: "30%",
-                    ),
-                    PieChartSectionData(
-                      value: 20,
-                      color: Colors.green,
-                      title: "20%",
-                    ),
-                    PieChartSectionData(
-                      value: 10,
-                      color: Colors.orange,
-                      title: "10%",
-                    ),
-                  ],
+    return Scaffold(
+      appBar: AppBar(toolbarHeight: 3, backgroundColor: colors.secondary),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Pengeluaran",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: colors.tertiary,
                 ),
               ),
-            ),
+
+              const SizedBox(height: 20),
+
+              // 🔥 CARD CHART
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: colors.secondary,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: SizedBox(
+                  height: 220,
+                  child: PieChart(
+                    PieChartData(
+                      sectionsSpace: 3,
+                      centerSpaceRadius: 40,
+                      sections: [
+                        PieChartSectionData(
+                          value: 40,
+                          color: Colors.red,
+                          title: "40%",
+                        ),
+                        PieChartSectionData(
+                          value: 30,
+                          color: Colors.blue,
+                          title: "30%",
+                        ),
+                        PieChartSectionData(
+                          value: 20,
+                          color: Colors.green,
+                          title: "20%",
+                        ),
+                        PieChartSectionData(
+                          value: 10,
+                          color: Colors.orange,
+                          title: "10%",
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 🔥 LEGEND
+              _legendItem("Makanan", Colors.red, context),
+              _legendItem("Transport", Colors.blue, context),
+              _legendItem("Belanja", Colors.green, context),
+              _legendItem("Lainnya", Colors.orange, context),
+            ],
           ),
-
-          const SizedBox(height: 20),
-
-          // 🔥 LEGEND
-          _legendItem("Makanan", Colors.red, context),
-          _legendItem("Transport", Colors.blue, context),
-          _legendItem("Belanja", Colors.green, context),
-          _legendItem("Lainnya", Colors.orange, context),
-        ],
+        ),
       ),
     );
   }

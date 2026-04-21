@@ -6,6 +6,15 @@ import 'package:intl/intl.dart';
 
 class HomeController extends GetxController {
   final user = FirebaseAuth.instance.currentUser;
+  final isTopDrawerOpen = false.obs;
+
+  void toggleDrawer() {
+    isTopDrawerOpen.value = !isTopDrawerOpen.value;
+  }
+
+  void closeDrawer() {
+    isTopDrawerOpen.value = false;
+  }
 
   Stream<QuerySnapshot<Map<String, dynamic>>>? transaksiStream;
   Stream<QuerySnapshot<Map<String, dynamic>>> getCategories() {
@@ -99,8 +108,7 @@ class HomeController extends GetxController {
     for (var doc in docs) {
       final data = doc.data();
       final date = (data['date'] as Timestamp).toDate();
-
-      final key = DateFormat('yyyy-MM-dd').format(date);
+      final key = DateFormat('d MMM, EEEE', 'id_ID').format(date);
 
       if (!grouped.containsKey(key)) {
         grouped[key] = [];
@@ -110,5 +118,32 @@ class HomeController extends GetxController {
     }
 
     return grouped;
+  }
+
+  Map<String, int> sumIncomeByDate(
+    Map<String, List<DocumentSnapshot>> grouped,
+  ) {
+    final Map<String, int> totals = {};
+
+    grouped.forEach((key, docs) {
+      int total = 0;
+
+      for (var doc in docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final categoryId = data['category'];
+        final categoryData = categoryMap[categoryId];
+
+        final isIncome = categoryData?['type'] == 'pemasukan';
+        final amount = (data['amount'] as num?) ?? 0;
+
+        if (isIncome) {
+          total += amount.toInt();
+        }
+      }
+
+      totals[key] = total;
+    });
+
+    return totals;
   }
 }
