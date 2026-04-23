@@ -476,7 +476,7 @@ class MyHomePage extends StatelessWidget {
       SafeArea(
         bottom: true,
         child: FractionallySizedBox(
-          heightFactor: 0.6,
+          heightFactor: 0.8,
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(

@@ -13,6 +13,10 @@ class AddController extends GetxController {
         .snapshots();
   }
 
+  Future<void> deleteCategory(String id) async {
+    await FirebaseFirestore.instance.collection('categories').doc(id).delete();
+  }
+
   Future<void> updateTransaction({
     required String id,
     required int amount,

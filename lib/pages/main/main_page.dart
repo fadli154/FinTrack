@@ -82,90 +82,93 @@ void _showAddModal(BuildContext context) {
   final colors = Theme.of(context).colorScheme;
 
   Get.bottomSheet(
-    FractionallySizedBox(
-      heightFactor: 0.75,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: colors.secondary,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        child: DefaultTabController(
-          length: 2,
-          child: Column(
-            children: [
-              Container(
-                width: 40,
-                height: 5,
-                margin: const EdgeInsets.only(bottom: 15),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(10),
+    SafeArea(
+      bottom: true,
+      child: FractionallySizedBox(
+        heightFactor: 0.8,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: colors.secondary,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+          ),
+          child: DefaultTabController(
+            length: 2,
+            child: Column(
+              children: [
+                Container(
+                  width: 40,
+                  height: 5,
+                  margin: const EdgeInsets.only(bottom: 15),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
-              ),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Tambahkan",
-                    style: GoogleFonts.poppins(
-                      textStyle: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        color: colors.tertiary,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Tambahkan",
+                      style: GoogleFonts.poppins(
+                        textStyle: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: colors.tertiary,
+                        ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () => Get.back(),
-                    icon: Icon(Icons.close, color: colors.tertiary),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 15),
-
-              Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Colors.grey.shade300, width: 2),
-                    top: BorderSide(color: Colors.grey.shade300, width: 1),
-                  ),
-                ),
-
-                child: TabBar(
-                  indicatorPadding: const EdgeInsets.symmetric(
-                    horizontal: -53,
-                    vertical: 0,
-                  ),
-
-                  indicator: BoxDecoration(
-                    color: colors.surface,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  labelColor: colors.inverseSurface,
-                  dividerColor: Color.fromARGB(0, 217, 217, 217),
-                  unselectedLabelColor: colors.tertiary,
-                  tabs: [
-                    Tab(text: "Pengeluaran"),
-                    Tab(text: "Pemasukan"),
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: Icon(Icons.close, color: colors.tertiary),
+                    ),
                   ],
                 ),
-              ),
 
-              const SizedBox(height: 25),
+                const SizedBox(height: 15),
 
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    _buildCategoryGrid("pengeluaran", context),
-                    _buildCategoryGrid("pemasukan", context),
-                  ],
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey.shade300, width: 2),
+                      top: BorderSide(color: Colors.grey.shade300, width: 1),
+                    ),
+                  ),
+
+                  child: TabBar(
+                    indicatorPadding: const EdgeInsets.symmetric(
+                      horizontal: -53,
+                      vertical: 0,
+                    ),
+
+                    indicator: BoxDecoration(
+                      color: colors.surface,
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    labelColor: colors.inverseSurface,
+                    dividerColor: Color.fromARGB(0, 217, 217, 217),
+                    unselectedLabelColor: colors.tertiary,
+                    tabs: [
+                      Tab(text: "Pengeluaran"),
+                      Tab(text: "Pemasukan"),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 25),
+
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      _buildCategoryGrid("pengeluaran", context),
+                      _buildCategoryGrid("pemasukan", context),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -236,24 +239,28 @@ Widget _buildCategoryGrid(String type, BuildContext context) {
             onTap: () {
               _showInputDialog(context, categoryId, title, type);
             },
-            child: Column(
+            child: Stack(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: homeController.getColorFromHex(color),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    homeController.getIconFromString(icon),
-                    color: Colors.white,
-                    size: 26,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  title,
-                  style: TextStyle(fontSize: 11, color: colors.tertiary),
+                Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: homeController.getColorFromHex(color),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        homeController.getIconFromString(icon),
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      title,
+                      style: TextStyle(fontSize: 11, color: colors.tertiary),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -262,6 +269,44 @@ Widget _buildCategoryGrid(String type, BuildContext context) {
       );
     },
   );
+}
+
+void _confirmDeleteCategory(
+  BuildContext context,
+  String categoryId,
+  String title,
+) {
+  final controller = Get.find<AddController>();
+  final colors = Theme.of(context).colorScheme;
+
+  AwesomeDialog(
+    context: context,
+    dialogType: DialogType.warning,
+    animType: AnimType.scale,
+    dialogBackgroundColor: colors.secondary,
+
+    title: "Hapus Kategori",
+    desc: "Yakin mau hapus '$title'?",
+
+    titleTextStyle: TextStyle(color: colors.tertiary),
+    descTextStyle: TextStyle(color: colors.tertiary),
+
+    btnCancelText: "Batal",
+    btnCancelColor: colors.primary,
+
+    btnOkText: "Hapus",
+    btnOkColor: Colors.red,
+
+    btnOkOnPress: () async {
+      try {
+        await controller.deleteCategory(categoryId);
+
+        showSnack(title: "Sukses", message: "Kategori berhasil dihapus");
+      } catch (e) {
+        showSnack(title: "Error", message: e.toString(), isError: true);
+      }
+    },
+  ).show();
 }
 
 void _showInputDialog(
@@ -323,9 +368,28 @@ void _showInputDialog(
                       color: colors.tertiary,
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => Get.back(),
-                    icon: Icon(Icons.close, color: colors.tertiary),
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => _confirmDeleteCategory(
+                          context,
+                          categoryId,
+                          categoryName,
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Get.back(),
+                        icon: Icon(Icons.close, color: colors.tertiary),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -531,87 +595,92 @@ void _showAddCategoryDialog(BuildContext context, String type) {
   final nameC = TextEditingController();
 
   Get.bottomSheet(
-    FractionallySizedBox(
-      heightFactor: 0.4,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: colors.secondary, // 🔥 fix warna (tadi salah pakai tertiary)
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
+    SafeArea(
+      bottom: true,
+      child: FractionallySizedBox(
+        heightFactor: 0.4,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: colors.secondary, // 🔥 fix warna (tadi salah pakai tertiary)
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 10),
 
-            Text(
-              "Tambah Kategori",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: colors.tertiary,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            TextField(
-              controller: nameC,
-              style: TextStyle(color: colors.tertiary), // 🔥 warna teks
-              cursorColor: colors.tertiary,
-              decoration: InputDecoration(
-                hintText: "Nama kategori",
-                hintStyle: TextStyle(color: colors.tertiary),
-
-                filled: true,
-                fillColor: colors.secondary,
-
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: colors.tertiary),
-                ),
-
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: colors.tertiary, width: 1.5),
+              Text(
+                "Tambah Kategori",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: colors.tertiary,
                 ),
               ),
-            ),
-            const Spacer(),
 
-            ElevatedButton(
-              onPressed: () async {
-                final randomColor = getRandomColorHex();
+              const SizedBox(height: 20),
 
-                await FirebaseFirestore.instance.collection('categories').add({
-                  'name': nameC.text,
-                  'icon': 'category', // 🔥 default icon
-                  'color': randomColor, // 🔥 random warna
-                  'type': type,
-                });
+              TextField(
+                controller: nameC,
+                style: TextStyle(color: colors.tertiary), // 🔥 warna teks
+                cursorColor: colors.tertiary,
+                decoration: InputDecoration(
+                  hintText: "Nama kategori",
+                  hintStyle: TextStyle(color: colors.tertiary),
 
-                Get.back();
+                  filled: true,
+                  fillColor: colors.secondary,
 
-                showSnack(
-                  title: "Sukses",
-                  message: "Kategori berhasil ditambahkan",
-                );
-              },
-              child: Text(
-                "Simpan",
-                style: TextStyle(color: colors.inverseSurface),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colors.tertiary),
+                  ),
+
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colors.tertiary, width: 1.5),
+                  ),
+                ),
               ),
-            ),
-          ],
+              const Spacer(),
+
+              ElevatedButton(
+                onPressed: () async {
+                  final randomColor = getRandomColorHex();
+
+                  await FirebaseFirestore.instance.collection('categories').add(
+                    {
+                      'name': nameC.text,
+                      'icon': 'category', // 🔥 default icon
+                      'color': randomColor, // 🔥 random warna
+                      'type': type,
+                    },
+                  );
+
+                  Get.back();
+
+                  showSnack(
+                    title: "Sukses",
+                    message: "Kategori berhasil ditambahkan",
+                  );
+                },
+                child: Text(
+                  "Simpan",
+                  style: TextStyle(color: colors.inverseSurface),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     ),
