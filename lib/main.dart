@@ -17,6 +17,7 @@ import 'package:fintrack/bindings/page_binding.dart';
 // import 'package:fintrack/pages/main/home.dart';
 import 'package:fintrack/pages/main/main_page.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
@@ -56,6 +57,8 @@ class MyApp extends StatelessWidget {
           inversePrimary: const Color.fromARGB(255, 0, 183, 165),
           inverseSurface: const Color.fromARGB(255, 255, 255, 255),
         ),
+
+        textTheme: GoogleFonts.poppinsTextTheme(),
       ),
 
       darkTheme: ThemeData(
@@ -71,6 +74,7 @@ class MyApp extends StatelessWidget {
           inversePrimary: const Color.fromARGB(255, 226, 226, 226),
           inverseSurface: const Color.fromARGB(186, 255, 255, 255),
         ),
+        textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
 
         appBarTheme: AppBarTheme(
           backgroundColor: Color.fromARGB(255, 26, 26, 26),

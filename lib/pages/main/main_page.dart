@@ -336,7 +336,7 @@ void _showInputDialog(
     SafeArea(
       bottom: true,
       child: FractionallySizedBox(
-        heightFactor: 0.5,
+        heightFactor: 0.65,
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
