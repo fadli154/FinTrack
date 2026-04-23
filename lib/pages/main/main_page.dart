@@ -25,7 +25,7 @@ class MyMainPage extends StatelessWidget {
   final themeController = Get.put(ThemeController());
 
   final List<Widget> _pages = [
-    MyHomePage(title: "Riwayat"),
+    MyHomePage(title: "FinTrack"),
     ChartPage(),
     Center(child: Text("baok")),
     LaporanPage(),
@@ -52,8 +52,8 @@ class MyMainPage extends StatelessWidget {
           shadowColor: colors.shadow.withValues(alpha: 0.25),
 
           cornerRadius: 20,
-          curveSize: 120,
-          top: -25,
+          curveSize: 0,
+          top: -45,
 
           style: TabStyle.fixedCircle,
 
@@ -288,211 +288,214 @@ void _showInputDialog(
   noteC.addListener(validate);
 
   Get.bottomSheet(
-    FractionallySizedBox(
-      heightFactor: 0.5,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: colors.secondary,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        child: Column(
-          children: [
-            // 🔹 HANDLE BAR
-            Container(
-              width: 40,
-              height: 5,
-              margin: const EdgeInsets.only(bottom: 15),
-              decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-
-            // 🔹 HEADER
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  categoryName,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: colors.tertiary,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Get.back(),
-                  icon: Icon(Icons.close, color: colors.tertiary),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // 🔹 INPUT AMOUNT
-            TextField(
-              controller: amountC,
-              keyboardType: TextInputType.number,
-              inputFormatters: [CurrencyInputFormatter()],
-              style: const TextStyle(color: Colors.black),
-              decoration: InputDecoration(
-                hintText: "Rp 0",
-                hintStyle: const TextStyle(color: Colors.grey),
-                filled: true,
-                fillColor: const Color.fromARGB(217, 245, 245, 245),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+    SafeArea(
+      bottom: true,
+      child: FractionallySizedBox(
+        heightFactor: 0.5,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: colors.secondary,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+          ),
+          child: Column(
+            children: [
+              // 🔹 HANDLE BAR
+              Container(
+                width: 40,
+                height: 5,
+                margin: const EdgeInsets.only(bottom: 15),
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 12),
-
-            // 🔹 INPUT NOTE
-            TextField(
-              controller: noteC,
-              style: const TextStyle(color: Colors.black),
-
-              decoration: InputDecoration(
-                hintText: "Catatan",
-                hintStyle: const TextStyle(color: Colors.grey),
-                filled: true,
-                fillColor: const Color.fromARGB(213, 245, 245, 245),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            // 🔹 DATE PICKER
-            Obx(
-              () => ListTile(
-                title: Text(
-                  "Tanggal: ${selectedDate.value.toString().split(' ')[0]}",
-                  style: TextStyle(color: colors.tertiary),
-                ),
-                trailing: Icon(Icons.calendar_today, color: colors.tertiary),
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: selectedDate.value,
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime.now(),
-                    builder: (context, child) {
-                      return Theme(
-                        data: Theme.of(context).copyWith(
-                          colorScheme: colors,
-                          primaryColor: colors.primary,
-                          cardColor: colors.secondary,
-                          canvasColor: colors.secondary,
-                        ),
-                        child: child!,
-                      );
-                    },
-                  );
-
-                  if (picked != null) {
-                    selectedDate.value = picked;
-                  }
-                },
-              ),
-            ),
-
-            const Spacer(),
-
-            // 🔹 BUTTON SAVE
-            Obx(
-              () => SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: isValid.value
-                      ? () async {
-                          final raw = amountC.text.replaceAll(
-                            RegExp(r'[^0-9]'),
-                            '',
-                          );
-                          final amount = int.tryParse(raw) ?? 0;
-
-                          await controller.addTransaction(
-                            categoryId: categoryId,
-                            amount: amount,
-                            note: noteC.text,
-                            date: selectedDate.value,
-                          );
-                          Get.back();
-                          Get.back();
-                          AwesomeDialog(
-                            context: Get.overlayContext!,
-                            dialogType: DialogType.success,
-                            animType: AnimType.scale,
-                            dialogBackgroundColor: colors.secondary,
-                            titleTextStyle: TextStyle(color: colors.tertiary),
-                            descTextStyle: TextStyle(color: colors.tertiary),
-                            dismissOnTouchOutside: false,
-
-                            body: Column(
-                              children: [
-                                Text(
-                                  "Berhasil!",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: colors.tertiary,
-                                  ),
-                                ),
-
-                                const SizedBox(height: 6),
-
-                                Text(
-                                  "Transaksi berhasil ditambahkan",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: colors.tertiary,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-
-                                const SizedBox(height: 20),
-                              ],
-                            ),
-                            btnOkColor: colors.primary,
-
-                            btnOkOnPress: () async {
-                              try {
-                                Get.back();
-
-                                showSnack(
-                                  title: "Sukses",
-                                  message: "Transaksi berhasil ditambahkan",
-                                );
-                              } catch (e) {
-                                showSnack(
-                                  title: "Error",
-                                  message: e.toString(),
-                                );
-                              }
-                            },
-                          ).show();
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colors.primary,
-                    foregroundColor: colors.inverseSurface,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              // 🔹 HEADER
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    categoryName,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: colors.tertiary,
                     ),
                   ),
-                  child: const Text("Simpan"),
+                  IconButton(
+                    onPressed: () => Get.back(),
+                    icon: Icon(Icons.close, color: colors.tertiary),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // 🔹 INPUT AMOUNT
+              TextField(
+                controller: amountC,
+                keyboardType: TextInputType.number,
+                inputFormatters: [CurrencyInputFormatter()],
+                style: const TextStyle(color: Colors.black),
+                decoration: InputDecoration(
+                  hintText: "Rp 0",
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: const Color.fromARGB(217, 245, 245, 245),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
-            ),
-          ],
+
+              const SizedBox(height: 12),
+
+              // 🔹 INPUT NOTE
+              TextField(
+                controller: noteC,
+                style: const TextStyle(color: Colors.black),
+
+                decoration: InputDecoration(
+                  hintText: "Catatan",
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: const Color.fromARGB(213, 245, 245, 245),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 15),
+
+              // 🔹 DATE PICKER
+              Obx(
+                () => ListTile(
+                  title: Text(
+                    "Tanggal: ${selectedDate.value.toString().split(' ')[0]}",
+                    style: TextStyle(color: colors.tertiary),
+                  ),
+                  trailing: Icon(Icons.calendar_today, color: colors.tertiary),
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: selectedDate.value,
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime.now(),
+                      builder: (context, child) {
+                        return Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: colors,
+                            primaryColor: colors.primary,
+                            cardColor: colors.secondary,
+                            canvasColor: colors.secondary,
+                          ),
+                          child: child!,
+                        );
+                      },
+                    );
+
+                    if (picked != null) {
+                      selectedDate.value = picked;
+                    }
+                  },
+                ),
+              ),
+
+              const Spacer(),
+
+              // 🔹 BUTTON SAVE
+              Obx(
+                () => SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: isValid.value
+                        ? () async {
+                            final raw = amountC.text.replaceAll(
+                              RegExp(r'[^0-9]'),
+                              '',
+                            );
+                            final amount = int.tryParse(raw) ?? 0;
+
+                            await controller.addTransaction(
+                              categoryId: categoryId,
+                              amount: amount,
+                              note: noteC.text,
+                              date: selectedDate.value,
+                            );
+                            Get.back();
+                            Get.back();
+                            AwesomeDialog(
+                              context: Get.overlayContext!,
+                              dialogType: DialogType.success,
+                              animType: AnimType.scale,
+                              dialogBackgroundColor: colors.secondary,
+                              titleTextStyle: TextStyle(color: colors.tertiary),
+                              descTextStyle: TextStyle(color: colors.tertiary),
+                              dismissOnTouchOutside: false,
+
+                              body: Column(
+                                children: [
+                                  Text(
+                                    "Berhasil!",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: colors.tertiary,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 6),
+
+                                  Text(
+                                    "Transaksi berhasil ditambahkan",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: colors.tertiary,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+
+                                  const SizedBox(height: 20),
+                                ],
+                              ),
+                              btnOkColor: colors.primary,
+
+                              btnOkOnPress: () async {
+                                try {
+                                  Get.back();
+
+                                  showSnack(
+                                    title: "Sukses",
+                                    message: "Transaksi berhasil ditambahkan",
+                                  );
+                                } catch (e) {
+                                  showSnack(
+                                    title: "Error",
+                                    message: e.toString(),
+                                  );
+                                }
+                              },
+                            ).show();
+                          }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colors.primary,
+                      foregroundColor: colors.inverseSurface,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text("Simpan"),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     ),

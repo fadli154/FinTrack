@@ -62,6 +62,7 @@ class IntroductionPage extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
+        bottom: true,
         child: Stack(
           children: [
             Container(

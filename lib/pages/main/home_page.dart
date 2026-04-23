@@ -283,164 +283,172 @@ class MyHomePage extends StatelessWidget {
     final isIncome = categoryData?['type'] == 'pemasukan';
 
     Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: colors.secondary,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // HANDLE
-            Container(
-              width: 40,
-              height: 5,
-              margin: const EdgeInsets.only(bottom: 15),
-              decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-
-            // ICON
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: controller.getColorFromHex(colorHex),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                controller.getIconFromString(iconName),
-                color: Colors.white,
-                size: 28,
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            // CATEGORY
-            Text(
-              controller.capitalizeEachWord(categoryName),
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: colors.tertiary,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            // NOTE
-            Text(
-              controller.capitalizeEachWord(note),
-              style: TextStyle(
-                fontSize: 14,
-                color: colors.tertiary.withValues(alpha: 0.6),
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            // AMOUNT
-            Text(
-              "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern('id').format(amount)}",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: colors.tertiary,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // BUTTONS
-            Row(
-              children: [
-                // EDIT
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Get.back();
-                      _showEditDialog(context, data, docId);
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: colors.tertiary),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      "Edit",
-                      style: TextStyle(color: colors.tertiary),
-                    ),
-                  ),
+      SafeArea(
+        bottom: true,
+        child: Container(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            20 + MediaQuery.of(context).viewPadding.bottom,
+          ),
+          decoration: BoxDecoration(
+            color: colors.secondary,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // HANDLE
+              Container(
+                width: 40,
+                height: 5,
+                margin: const EdgeInsets.only(bottom: 15),
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(10),
                 ),
+              ),
 
-                const SizedBox(width: 10),
+              // ICON
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: controller.getColorFromHex(colorHex),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  controller.getIconFromString(iconName),
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
 
-                // DELETE
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      AwesomeDialog(
-                        context: context,
+              const SizedBox(height: 15),
 
-                        dialogType: DialogType.warning,
-                        animType: AnimType.scale,
-                        dialogBackgroundColor: colors.secondary,
-                        titleTextStyle: TextStyle(color: colors.tertiary),
-                        descTextStyle: TextStyle(color: colors.tertiary),
+              // CATEGORY
+              Text(
+                controller.capitalizeEachWord(categoryName),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: colors.tertiary,
+                ),
+              ),
 
-                        title: 'Hapus Transaksi',
-                        desc: 'Yakin mau hapus transaksi ini?',
-                        btnCancelOnPress: () {},
-                        btnCancelColor: colors.primary,
-                        btnCancel: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            side: BorderSide(color: colors.tertiary),
-                          ),
-                          onPressed: () => Get.back(),
-                          child: Text(
-                            "Batal",
-                            style: TextStyle(color: colors.tertiary),
-                          ),
+              const SizedBox(height: 8),
+
+              // NOTE
+              Text(
+                controller.capitalizeEachWord(note),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: colors.tertiary.withValues(alpha: 0.6),
+                ),
+              ),
+
+              const SizedBox(height: 15),
+
+              // AMOUNT
+              Text(
+                "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern('id').format(amount)}",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: colors.tertiary,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // BUTTONS
+              Row(
+                children: [
+                  // EDIT
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Get.back();
+                        _showEditDialog(context, data, docId);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: colors.tertiary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        btnOkText: "Hapus",
-                        btnOkColor: Colors.red,
-                        btnOkOnPress: () async {
-                          try {
-                            await controller.deleteTransaction(docId);
-                            Get.back();
-
-                            showSnack(
-                              title: "Sukses",
-                              message: "Transaksi berhasil dihapus",
-                            );
-                          } catch (e) {
-                            showSnack(title: "Error", message: e.toString());
-                          }
-                        },
-                      ).show();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        "Edit",
+                        style: TextStyle(color: colors.tertiary),
                       ),
                     ),
-                    child: Text(
-                      "Hapus",
-                      style: TextStyle(color: colors.inverseSurface),
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  // DELETE
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        AwesomeDialog(
+                          context: context,
+
+                          dialogType: DialogType.warning,
+                          animType: AnimType.scale,
+                          dialogBackgroundColor: colors.secondary,
+                          titleTextStyle: TextStyle(color: colors.tertiary),
+                          descTextStyle: TextStyle(color: colors.tertiary),
+
+                          title: 'Hapus Transaksi',
+                          desc: 'Yakin mau hapus transaksi ini?',
+                          btnCancelOnPress: () {},
+                          btnCancelColor: colors.primary,
+                          btnCancel: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              side: BorderSide(color: colors.tertiary),
+                            ),
+                            onPressed: () => Get.back(),
+                            child: Text(
+                              "Batal",
+                              style: TextStyle(color: colors.tertiary),
+                            ),
+                          ),
+                          btnOkText: "Hapus",
+                          btnOkColor: Colors.red,
+                          btnOkOnPress: () async {
+                            try {
+                              await controller.deleteTransaction(docId);
+                              Get.back();
+
+                              showSnack(
+                                title: "Sukses",
+                                message: "Transaksi berhasil dihapus",
+                              );
+                            } catch (e) {
+                              showSnack(title: "Error", message: e.toString());
+                            }
+                          },
+                        ).show();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        "Hapus",
+                        style: TextStyle(color: colors.inverseSurface),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
       isScrollControlled: true,
@@ -465,87 +473,92 @@ class MyHomePage extends StatelessWidget {
     final noteC = TextEditingController(text: data['note']);
 
     Get.bottomSheet(
-      FractionallySizedBox(
-        heightFactor: 0.6,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: colors.secondary,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 20),
+      SafeArea(
+        bottom: true,
+        child: FractionallySizedBox(
+          heightFactor: 0.6,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colors.secondary,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(25),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 20),
 
-              Text(
-                "Edit Transaksi",
-                style: GoogleFonts.poppins(
-                  textStyle: TextStyle(
-                    fontSize: 16,
-                    color: colors.tertiary,
-                    fontWeight: FontWeight.bold,
+                Text(
+                  "Edit Transaksi",
+                  style: GoogleFonts.poppins(
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      color: colors.tertiary,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 25),
+                const SizedBox(height: 25),
 
-              TextField(
-                controller: amountC,
-                keyboardType: TextInputType.number,
-                inputFormatters: [CurrencyInputFormatter()],
-                style: const TextStyle(color: Colors.black),
-                decoration: InputDecoration(
-                  labelStyle: TextStyle(color: colors.tertiary),
-                  hintText: "Rp 0",
-                  hintStyle: const TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: const Color.fromARGB(217, 245, 245, 245),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+                TextField(
+                  controller: amountC,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [CurrencyInputFormatter()],
+                  style: const TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    labelStyle: TextStyle(color: colors.tertiary),
+                    hintText: "Rp 0",
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: const Color.fromARGB(217, 245, 245, 245),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 25),
-              TextField(
-                controller: noteC,
-                style: const TextStyle(color: Colors.black),
+                const SizedBox(height: 25),
+                TextField(
+                  controller: noteC,
+                  style: const TextStyle(color: Colors.black),
 
-                decoration: InputDecoration(
-                  hintStyle: const TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: const Color.fromARGB(213, 245, 245, 245),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+                  decoration: InputDecoration(
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: const Color.fromARGB(213, 245, 245, 245),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              ElevatedButton(
-                onPressed: () async {
-                  final cleanAmount = int.parse(
-                    amountC.text.replaceAll(RegExp(r'[^0-9]'), ''),
-                  );
+                ElevatedButton(
+                  onPressed: () async {
+                    final cleanAmount = int.parse(
+                      amountC.text.replaceAll(RegExp(r'[^0-9]'), ''),
+                    );
 
-                  await controller.updateTransaction(
-                    id: docId,
-                    amount: cleanAmount,
-                    note: noteC.text,
-                  );
+                    await controller.updateTransaction(
+                      id: docId,
+                      amount: cleanAmount,
+                      note: noteC.text,
+                    );
 
-                  Get.back();
-                },
-                child: Text(
-                  "Update",
-                  style: TextStyle(color: colors.inverseSurface),
+                    Get.back();
+                  },
+                  child: Text(
+                    "Update",
+                    style: TextStyle(color: colors.inverseSurface),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
