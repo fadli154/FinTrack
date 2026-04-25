@@ -336,7 +336,7 @@ void _showInputDialog(
     SafeArea(
       bottom: true,
       child: FractionallySizedBox(
-        heightFactor: 0.65,
+        heightFactor: 0.5,
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -448,15 +448,59 @@ void _showInputDialog(
                       context: context,
                       initialDate: selectedDate.value,
                       firstDate: DateTime(2020),
-                      lastDate: DateTime.now(),
+                      lastDate: DateTime(2100),
+
                       builder: (context, child) {
+                        final isDark =
+                            Theme.of(context).brightness == Brightness.dark;
+
                         return Theme(
-                          data: Theme.of(context).copyWith(
-                            colorScheme: colors,
-                            primaryColor: colors.primary,
-                            cardColor: colors.secondary,
-                            canvasColor: colors.secondary,
-                          ),
+                          data: (isDark ? ThemeData.dark() : ThemeData.light())
+                              .copyWith(
+                                colorScheme: ColorScheme.fromSeed(
+                                  seedColor: Colors
+                                      .teal, // ganti ungu default jadi teal
+                                  brightness: isDark
+                                      ? Brightness.dark
+                                      : Brightness.light,
+                                ),
+
+                                datePickerTheme: DatePickerThemeData(
+                                  headerBackgroundColor: Colors.teal,
+                                  headerForegroundColor: Colors.white,
+
+                                  todayForegroundColor: WidgetStatePropertyAll(
+                                    Colors.teal,
+                                  ),
+
+                                  dayForegroundColor:
+                                      WidgetStateProperty.resolveWith((states) {
+                                        if (states.contains(
+                                          WidgetState.selected,
+                                        )) {
+                                          return Colors.white;
+                                        }
+                                        return isDark
+                                            ? Colors.white
+                                            : Colors.black;
+                                      }),
+
+                                  dayBackgroundColor:
+                                      WidgetStateProperty.resolveWith((states) {
+                                        if (states.contains(
+                                          WidgetState.selected,
+                                        )) {
+                                          return Colors.teal;
+                                        }
+                                        return null;
+                                      }),
+
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                              ),
+
                           child: child!,
                         );
                       },

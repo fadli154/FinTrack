@@ -34,6 +34,57 @@ class MyHomePage extends StatelessWidget {
                 initialDate: controller.selectedDate.value,
                 firstDate: DateTime(2020),
                 lastDate: DateTime(2100),
+
+                builder: (context, child) {
+                  final isDark =
+                      Theme.of(context).brightness == Brightness.dark;
+
+                  return Theme(
+                    data: (isDark ? ThemeData.dark() : ThemeData.light())
+                        .copyWith(
+                          colorScheme: ColorScheme.fromSeed(
+                            seedColor:
+                                Colors.teal, // ganti ungu default jadi teal
+                            brightness: isDark
+                                ? Brightness.dark
+                                : Brightness.light,
+                          ),
+
+                          datePickerTheme: DatePickerThemeData(
+                            headerBackgroundColor: Colors.teal,
+                            headerForegroundColor: Colors.white,
+
+                            todayForegroundColor: WidgetStatePropertyAll(
+                              Colors.teal,
+                            ),
+
+                            dayForegroundColor: WidgetStateProperty.resolveWith(
+                              (states) {
+                                if (states.contains(WidgetState.selected)) {
+                                  return Colors.white;
+                                }
+                                return isDark ? Colors.white : Colors.black;
+                              },
+                            ),
+
+                            dayBackgroundColor: WidgetStateProperty.resolveWith(
+                              (states) {
+                                if (states.contains(WidgetState.selected)) {
+                                  return Colors.teal;
+                                }
+                                return null;
+                              },
+                            ),
+
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        ),
+
+                    child: child!,
+                  );
+                },
               );
 
               if (picked != null) {
@@ -45,11 +96,24 @@ class MyHomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("$year", style: const TextStyle(fontSize: 12)),
+                Text(
+                  "$year",
+                  style: TextStyle(fontSize: 12, color: colors.inverseSurface),
+                ),
                 Row(
                   children: [
-                    Text(month),
-                    const Icon(Icons.keyboard_arrow_down),
+                    Text(
+                      month,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: colors.inverseSurface,
+                      ),
+                    ),
+                    Icon(
+                      Icons.keyboard_arrow_down,
+                      color: colors.inverseSurface,
+                    ),
                   ],
                 ),
               ],
@@ -60,17 +124,88 @@ class MyHomePage extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () => controller.toggleDrawer(),
+          color: colors.inverseSurface,
         ),
         actions: [
           // 🔥 DATE RANGE
           IconButton(
             icon: const Icon(Icons.date_range),
+            color: colors.inverseSurface,
             onPressed: () async {
               final picked = await showDateRangePicker(
                 context: context,
-                firstDate: DateTime(2020),
+                firstDate: DateTime(2024),
                 lastDate: DateTime(2100),
+
+                builder: (context, child) {
+                  final isDark =
+                      Theme.of(context).brightness == Brightness.dark;
+
+                  return Theme(
+                    data: (isDark ? ThemeData.dark() : ThemeData.light())
+                        .copyWith(
+                          colorScheme: ColorScheme.fromSeed(
+                            seedColor: Colors.teal,
+                            brightness: isDark
+                                ? Brightness.dark
+                                : Brightness.light,
+                          ),
+
+                          datePickerTheme: DatePickerThemeData(
+                            headerBackgroundColor: Colors.teal,
+                            headerForegroundColor: Colors.white,
+
+                            todayForegroundColor: WidgetStatePropertyAll(
+                              Colors.teal,
+                            ),
+
+                            dayForegroundColor: WidgetStateProperty.resolveWith(
+                              (states) {
+                                if (states.contains(WidgetState.selected)) {
+                                  return Colors.white;
+                                }
+
+                                return isDark ? Colors.white : Colors.black;
+                              },
+                            ),
+
+                            dayBackgroundColor: WidgetStateProperty.resolveWith(
+                              (states) {
+                                if (states.contains(WidgetState.selected)) {
+                                  return Colors.teal;
+                                }
+                                return null;
+                              },
+                            ),
+
+                            rangeSelectionBackgroundColor: Colors.teal
+                                .withValues(alpha: .25),
+
+                            rangeSelectionOverlayColor: WidgetStatePropertyAll(
+                              Colors.teal.withValues(alpha: .15),
+                            ),
+
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+
+                          textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.teal,
+                            ),
+                          ),
+                        ),
+
+                    child: child!,
+                  );
+                },
               );
+
+              if (picked != null) {
+                controller.startDate.value = picked.start;
+                controller.endDate.value = picked.end;
+              }
 
               if (picked != null) {
                 controller.startDate.value = picked.start;
@@ -82,8 +217,9 @@ class MyHomePage extends StatelessWidget {
           // 🔥 SEARCH
           IconButton(
             icon: const Icon(Icons.search),
+            color: colors.inverseSurface,
             onPressed: () {
-              Get.bottomSheet(_buildSearchSheet(controller));
+              Get.bottomSheet(_buildSearchSheet(controller, context));
             },
           ),
         ],
@@ -139,215 +275,228 @@ class MyHomePage extends StatelessWidget {
           return const Center(child: Text("User belum login"));
         }
 
-        return StreamBuilder(
-          stream: controller.getTransaksiStream(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Center(child: Text("Error: ${snapshot.error}"));
-            }
+        return Obx(
+          () => StreamBuilder(
+            key: ValueKey(
+              "${controller.selectedDate.value.month}-"
+              "${controller.selectedDate.value.year}-"
+              "${controller.startDate.value}-"
+              "${controller.endDate.value}",
+            ),
+            stream: controller.getTransaksiStream(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(child: Text("Error: ${snapshot.error}"));
+              }
 
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-            final docs = snapshot.data?.docs ?? [];
+              final docs = snapshot.data?.docs ?? [];
 
-            if (docs.isEmpty) {
-              return _emptyState(colors);
-            }
+              if (docs.isEmpty) {
+                return _emptyState(colors);
+              }
 
-            return Column(
-              children: [
-                Expanded(
-                  child: Obx(() {
-                    final query = controller.searchQuery.value.toLowerCase();
+              return Column(
+                children: [
+                  Expanded(
+                    child: Obx(() {
+                      final query = controller.searchQuery.value.toLowerCase();
 
-                    // 🔥 FILTER DI AWAL (INI KUNCINYA)
-                    final filteredDocs = docs.where((doc) {
-                      final data = doc.data();
-                      final note = data['note'] ?? '';
-                      return note.toString().toLowerCase().contains(query);
-                    }).toList();
+                      // 🔥 FILTER DI AWAL (INI KUNCINYA)
+                      final filteredDocs = docs.where((doc) {
+                        final data = doc.data();
+                        final note = data['note'] ?? '';
+                        return note.toString().toLowerCase().contains(query);
+                      }).toList();
 
-                    // 🔥 BARU DI GROUP SETELAH FILTER
-                    final groupedData = controller.groupByDate(filteredDocs);
-                    final totals = controller.sumIncomeByDate(groupedData);
-                    final keys = groupedData.keys.toList();
+                      // 🔥 BARU DI GROUP SETELAH FILTER
+                      final groupedData = controller.groupByDate(filteredDocs);
+                      final totals = controller.sumIncomeByDate(groupedData);
+                      final keys = groupedData.keys.toList();
 
-                    return ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: keys.length,
-                      itemBuilder: (context, index) {
-                        final dateKey = keys[index];
-                        final items = groupedData[dateKey]!;
+                      return ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: keys.length,
+                        itemBuilder: (context, index) {
+                          final dateKey = keys[index];
+                          final items = groupedData[dateKey]!;
 
-                        final filteredItems = items;
+                          final filteredItems = items;
 
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // HEADER TANGGAL
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    dateKey,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: colors.tertiary,
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // HEADER TANGGAL
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      dateKey,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: colors.tertiary,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    "Pemasukan: Rp ${NumberFormat.decimalPattern('id').format(totals[dateKey] ?? 0)}",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green,
+                                    Text(
+                                      "Pemasukan: Rp ${NumberFormat.decimalPattern('id').format(totals[dateKey] ?? 0)}",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.green,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
 
-                            ...filteredItems.map((doc) {
-                              final data = doc.data() as Map<String, dynamic>;
-                              final docId = doc.id; // 🔥 ini kunci utama
-                              final categoryId = data['category'];
-                              final categoryData =
-                                  controller.categoryMap[categoryId];
-                              final categoryName =
-                                  categoryData?['name'] ?? 'Other';
-                              final note = data['note'];
+                              ...filteredItems.map((doc) {
+                                final data = doc.data() as Map<String, dynamic>;
+                                final docId = doc.id; // 🔥 ini kunci utama
+                                final categoryId = data['category'];
+                                final categoryData =
+                                    controller.categoryMap[categoryId];
+                                final categoryName =
+                                    categoryData?['name'] ?? 'Other';
+                                final note = data['note'];
 
-                              final displayText =
-                                  (note != null &&
-                                      note.toString().trim().isNotEmpty)
-                                  ? note
-                                  : categoryName;
+                                final displayText =
+                                    (note != null &&
+                                        note.toString().trim().isNotEmpty)
+                                    ? note
+                                    : categoryName;
 
-                              final iconName =
-                                  categoryData?['icon'] ?? 'attach_money';
-                              final colorHex =
-                                  categoryData?['color'] ?? '#9E9E9E';
-                              final isIncome =
-                                  categoryData?['type'] == 'pemasukan';
-                              final amount = (data['amount'] as num?) ?? 0;
+                                final iconName =
+                                    categoryData?['icon'] ?? 'attach_money';
+                                final colorHex =
+                                    categoryData?['color'] ?? '#9E9E9E';
+                                final isIncome =
+                                    categoryData?['type'] == 'pemasukan';
+                                final amount = (data['amount'] as num?) ?? 0;
 
-                              return GestureDetector(
-                                onTap: () {
-                                  _showDetailDialog(
-                                    context,
-                                    data,
-                                    categoryData,
-                                    docId,
-                                  );
-                                },
-                                child: Container(
-                                  margin: const EdgeInsets.only(bottom: 10),
-                                  padding: const EdgeInsets.all(14),
-                                  decoration: BoxDecoration(
-                                    color: colors.secondary.withAlpha(50),
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(
-                                      color: colors.tertiary.withValues(
-                                        alpha: .1,
+                                return GestureDetector(
+                                  onTap: () {
+                                    _showDetailDialog(
+                                      context,
+                                      data,
+                                      categoryData,
+                                      docId,
+                                    );
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.only(bottom: 10),
+                                    padding: const EdgeInsets.all(14),
+                                    decoration: BoxDecoration(
+                                      color: colors.secondary.withAlpha(50),
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color: colors.tertiary.withValues(
+                                          alpha: .1,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                          color: controller.getColorFromHex(
-                                            colorHex,
-                                          ),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          controller.getIconFromString(
-                                            iconName,
-                                          ),
-                                          color: Colors.white.withValues(
-                                            alpha: 0.7,
-                                          ),
-                                          size: 18,
-                                        ),
-                                      ),
-
-                                      const SizedBox(width: 12),
-
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            // 🔥 TITLE TRANSAKSI (note user)
-                                            Text(
-                                              controller.capitalizeEachWord(
-                                                categoryName,
-                                              ),
-                                              style: GoogleFonts.poppins(
-                                                textStyle: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: colors.tertiary
-                                                      .withValues(alpha: 0.6),
-                                                ),
-                                              ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: controller.getColorFromHex(
+                                              colorHex,
                                             ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            controller.getIconFromString(
+                                              iconName,
+                                            ),
+                                            color: Colors.white.withValues(
+                                              alpha: 0.7,
+                                            ),
+                                            size: 18,
+                                          ),
+                                        ),
 
-                                            const SizedBox(height: 3),
+                                        const SizedBox(width: 12),
 
-                                            Tooltip(
-                                              message: displayText,
-                                              child: Text(
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              // 🔥 TITLE TRANSAKSI (note user)
+                                              Text(
                                                 controller.capitalizeEachWord(
-                                                  displayText,
+                                                  categoryName,
                                                 ),
                                                 style: GoogleFonts.poppins(
                                                   textStyle: TextStyle(
-                                                    fontSize: 12,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
                                                     color: colors.tertiary
-                                                        .withValues(alpha: 0.4),
+                                                        .withValues(alpha: 0.6),
                                                   ),
                                                 ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
 
-                                      Text(
-                                        "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern('id').format(amount)}",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                          color: colors.tertiary.withValues(
-                                            alpha: 0.5,
+                                              const SizedBox(height: 3),
+
+                                              Tooltip(
+                                                message: displayText,
+                                                child: Text(
+                                                  controller.capitalizeEachWord(
+                                                    displayText,
+                                                  ),
+                                                  style: GoogleFonts.poppins(
+                                                    textStyle: TextStyle(
+                                                      fontSize: 12,
+                                                      color: colors.tertiary
+                                                          .withValues(
+                                                            alpha: 0.4,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ),
-                                    ],
+
+                                        Text(
+                                          "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern('id').format(amount)}",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            color: colors.tertiary.withValues(
+                                              alpha: 0.5,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            }),
-                          ],
-                        );
-                      },
-                    );
-                  }),
-                ),
-              ],
-            );
-          },
+                                );
+                              }),
+                            ],
+                          );
+                        },
+                      );
+                    }),
+                  ),
+                ],
+              );
+            },
+          ),
         );
       },
     );
@@ -699,33 +848,47 @@ void showSnack({
   );
 }
 
-Widget _buildSearchSheet(HomeController controller) {
+Widget _buildSearchSheet(HomeController controller, BuildContext context) {
   final textC = TextEditingController();
 
-  return Container(
-    padding: const EdgeInsets.all(16),
-    decoration: const BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TextField(
-          onChanged: (value) {
-            controller.searchQuery.value = value;
-          },
-          decoration: const InputDecoration(hintText: "Cari transaksi..."),
-        ),
-        const SizedBox(height: 10),
-        ElevatedButton(
-          onPressed: () {
-            controller.searchQuery.value = textC.text;
-            Get.back();
-          },
-          child: const Text("Cari"),
-        ),
-      ],
+  final colors = Theme.of(context).colorScheme;
+
+  return SafeArea(
+    bottom: true,
+    child: Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: colors.secondary,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            onChanged: (value) {
+              controller.searchQuery.value = value;
+            },
+            decoration: InputDecoration(
+              hintText: "Cari transaksi",
+              hintStyle: TextStyle(color: colors.tertiary),
+              filled: true,
+              fillColor: const Color.fromARGB(143, 245, 245, 245),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () {
+              controller.searchQuery.value = textC.text;
+              Get.back();
+            },
+            child: Text("Cari", style: TextStyle(color: colors.inverseSurface)),
+          ),
+        ],
+      ),
     ),
   );
 }

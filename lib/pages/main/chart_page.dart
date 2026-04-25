@@ -61,15 +61,12 @@ class ChartPage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: colors.primary,
-                      child: Icon(
-                        Icons.pie_chart_sharp,
-                        size: 28,
-                        color: colors.inverseSurface,
-                      ),
+                    Icon(
+                      Icons.pie_chart_sharp,
+                      size: 32,
+                      color: totalSaldo >= 0 ? Colors.green : Colors.red,
                     ),
+
                     const SizedBox(width: 15),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
