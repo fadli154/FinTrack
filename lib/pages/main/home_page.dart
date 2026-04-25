@@ -849,8 +849,6 @@ void showSnack({
 }
 
 Widget _buildSearchSheet(HomeController controller, BuildContext context) {
-  final textC = TextEditingController();
-
   final colors = Theme.of(context).colorScheme;
 
   return SafeArea(
@@ -880,13 +878,6 @@ Widget _buildSearchSheet(HomeController controller, BuildContext context) {
             ),
           ),
           const SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () {
-              controller.searchQuery.value = textC.text;
-              Get.back();
-            },
-            child: Text("Cari", style: TextStyle(color: colors.inverseSurface)),
-          ),
         ],
       ),
     ),
