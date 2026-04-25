@@ -11,8 +11,9 @@ import 'package:intl/intl.dart';
 
 class MyHomePage extends StatelessWidget {
   final String title;
+  final controller = Get.find<HomeController>();
 
-  const MyHomePage({super.key, required this.title});
+  MyHomePage({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -20,22 +21,72 @@ class MyHomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
+        backgroundColor: colors.primary,
+        title: Obx(() {
+          final monthFormat = DateFormat('MMM', 'id_ID');
+          final year = controller.selectedDate.value.year;
+          final month = monthFormat.format(controller.selectedDate.value);
+
+          return GestureDetector(
+            onTap: () async {
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: controller.selectedDate.value,
+                firstDate: DateTime(2020),
+                lastDate: DateTime(2100),
+              );
+
+              if (picked != null) {
+                controller.selectedDate.value = picked;
+                controller.startDate.value = null;
+                controller.endDate.value = null;
+              }
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("$year", style: const TextStyle(fontSize: 12)),
+                Row(
+                  children: [
+                    Text(month),
+                    const Icon(Icons.keyboard_arrow_down),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }),
+        centerTitle: false,
         leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white),
-          onPressed: () {
-            Get.find<HomeController>().toggleDrawer();
-          },
+          icon: const Icon(Icons.menu),
+          onPressed: () => controller.toggleDrawer(),
         ),
+        actions: [
+          // 🔥 DATE RANGE
+          IconButton(
+            icon: const Icon(Icons.date_range),
+            onPressed: () async {
+              final picked = await showDateRangePicker(
+                context: context,
+                firstDate: DateTime(2020),
+                lastDate: DateTime(2100),
+              );
+
+              if (picked != null) {
+                controller.startDate.value = picked.start;
+                controller.endDate.value = picked.end;
+              }
+            },
+          ),
+
+          // 🔥 SEARCH
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              Get.bottomSheet(_buildSearchSheet(controller));
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.only(
@@ -47,8 +98,6 @@ class MyHomePage extends StatelessWidget {
 
             // 🔥 DRAWER ONLY
             Obx(() {
-              final controller = Get.find<HomeController>();
-
               return Stack(
                 children: [
                   if (controller.isTopDrawerOpen.value)
@@ -90,11 +139,8 @@ class MyHomePage extends StatelessWidget {
           return const Center(child: Text("User belum login"));
         }
 
-        // ✅ sudah login → baru ambil controller
-        final controller = Get.find<HomeController>();
-
         return StreamBuilder(
-          stream: controller.transaksiStream,
+          stream: controller.getTransaksiStream(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Center(child: Text("Error: ${snapshot.error}"));
@@ -110,155 +156,196 @@ class MyHomePage extends StatelessWidget {
               return _emptyState(colors);
             }
 
-            final groupedData = controller.groupByDate(docs);
-            final totals = controller.sumIncomeByDate(groupedData);
-            final keys = groupedData.keys.toList();
+            return Column(
+              children: [
+                Expanded(
+                  child: Obx(() {
+                    final query = controller.searchQuery.value.toLowerCase();
 
-            return ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: keys.length,
-              itemBuilder: (context, index) {
-                final dateKey = keys[index];
-                final items = groupedData[dateKey]!;
+                    // 🔥 FILTER DI AWAL (INI KUNCINYA)
+                    final filteredDocs = docs.where((doc) {
+                      final data = doc.data();
+                      final note = data['note'] ?? '';
+                      return note.toString().toLowerCase().contains(query);
+                    }).toList();
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // HEADER TANGGAL
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            dateKey,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: colors.tertiary,
-                            ),
-                          ),
-                          Text(
-                            "Pemasukan: Rp ${NumberFormat.decimalPattern('id').format(totals[dateKey] ?? 0)}",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // 🔥 BARU DI GROUP SETELAH FILTER
+                    final groupedData = controller.groupByDate(filteredDocs);
+                    final totals = controller.sumIncomeByDate(groupedData);
+                    final keys = groupedData.keys.toList();
 
-                    ...items.map((doc) {
-                      final data = doc.data() as Map<String, dynamic>;
-                      final docId = doc.id; // 🔥 ini kunci utama
-                      final categoryId = data['category'];
-                      final categoryData = controller.categoryMap[categoryId];
-                      final categoryName = categoryData?['name'] ?? 'Other';
-                      final note = data['note'];
+                    return ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: keys.length,
+                      itemBuilder: (context, index) {
+                        final dateKey = keys[index];
+                        final items = groupedData[dateKey]!;
 
-                      final displayText =
-                          (note != null && note.toString().trim().isNotEmpty)
-                          ? note
-                          : categoryName;
+                        final filteredItems = items;
 
-                      final iconName = categoryData?['icon'] ?? 'attach_money';
-                      final colorHex = categoryData?['color'] ?? '#9E9E9E';
-                      final isIncome = categoryData?['type'] == 'pemasukan';
-                      final amount = (data['amount'] as num?) ?? 0;
-
-                      return GestureDetector(
-                        onTap: () {
-                          _showDetailDialog(context, data, categoryData, docId);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: colors.secondary.withAlpha(50),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: colors.tertiary.withValues(alpha: .1),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: controller.getColorFromHex(colorHex),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  controller.getIconFromString(iconName),
-                                  color: Colors.white.withValues(alpha: 0.7),
-                                  size: 18,
-                                ),
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // HEADER TANGGAL
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    dateKey,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: colors.tertiary,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Pemasukan: Rp ${NumberFormat.decimalPattern('id').format(totals[dateKey] ?? 0)}",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                ],
                               ),
+                            ),
 
-                              const SizedBox(width: 12),
+                            ...filteredItems.map((doc) {
+                              final data = doc.data() as Map<String, dynamic>;
+                              final docId = doc.id; // 🔥 ini kunci utama
+                              final categoryId = data['category'];
+                              final categoryData =
+                                  controller.categoryMap[categoryId];
+                              final categoryName =
+                                  categoryData?['name'] ?? 'Other';
+                              final note = data['note'];
 
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // 🔥 TITLE TRANSAKSI (note user)
-                                    Text(
-                                      controller.capitalizeEachWord(
-                                        categoryName,
-                                      ),
-                                      style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: colors.tertiary.withValues(
-                                            alpha: 0.6,
-                                          ),
-                                        ),
+                              final displayText =
+                                  (note != null &&
+                                      note.toString().trim().isNotEmpty)
+                                  ? note
+                                  : categoryName;
+
+                              final iconName =
+                                  categoryData?['icon'] ?? 'attach_money';
+                              final colorHex =
+                                  categoryData?['color'] ?? '#9E9E9E';
+                              final isIncome =
+                                  categoryData?['type'] == 'pemasukan';
+                              final amount = (data['amount'] as num?) ?? 0;
+
+                              return GestureDetector(
+                                onTap: () {
+                                  _showDetailDialog(
+                                    context,
+                                    data,
+                                    categoryData,
+                                    docId,
+                                  );
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: colors.secondary.withAlpha(50),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: colors.tertiary.withValues(
+                                        alpha: .1,
                                       ),
                                     ),
-
-                                    const SizedBox(height: 3),
-
-                                    Tooltip(
-                                      message: displayText,
-                                      child: Text(
-                                        controller.capitalizeEachWord(
-                                          displayText,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: controller.getColorFromHex(
+                                            colorHex,
+                                          ),
+                                          shape: BoxShape.circle,
                                         ),
-                                        style: GoogleFonts.poppins(
-                                          textStyle: TextStyle(
-                                            fontSize: 12,
-                                            color: colors.tertiary.withValues(
-                                              alpha: 0.4,
+                                        child: Icon(
+                                          controller.getIconFromString(
+                                            iconName,
+                                          ),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.7,
+                                          ),
+                                          size: 18,
+                                        ),
+                                      ),
+
+                                      const SizedBox(width: 12),
+
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // 🔥 TITLE TRANSAKSI (note user)
+                                            Text(
+                                              controller.capitalizeEachWord(
+                                                categoryName,
+                                              ),
+                                              style: GoogleFonts.poppins(
+                                                textStyle: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: colors.tertiary
+                                                      .withValues(alpha: 0.6),
+                                                ),
+                                              ),
                                             ),
+
+                                            const SizedBox(height: 3),
+
+                                            Tooltip(
+                                              message: displayText,
+                                              child: Text(
+                                                controller.capitalizeEachWord(
+                                                  displayText,
+                                                ),
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 12,
+                                                    color: colors.tertiary
+                                                        .withValues(alpha: 0.4),
+                                                  ),
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      Text(
+                                        "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern('id').format(amount)}",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                          color: colors.tertiary.withValues(
+                                            alpha: 0.5,
                                           ),
                                         ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-
-                              Text(
-                                "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern('id').format(amount)}",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: colors.tertiary.withValues(alpha: 0.5),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
-                  ],
-                );
-              },
+                              );
+                            }),
+                          ],
+                        );
+                      },
+                    );
+                  }),
+                ),
+              ],
             );
           },
         );
@@ -608,6 +695,37 @@ void showSnack({
     mainButton: TextButton(
       onPressed: () => Get.back(),
       child: const Text("Tutup", style: TextStyle(color: Colors.white)),
+    ),
+  );
+}
+
+Widget _buildSearchSheet(HomeController controller) {
+  final textC = TextEditingController();
+
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: const BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextField(
+          onChanged: (value) {
+            controller.searchQuery.value = value;
+          },
+          decoration: const InputDecoration(hintText: "Cari transaksi..."),
+        ),
+        const SizedBox(height: 10),
+        ElevatedButton(
+          onPressed: () {
+            controller.searchQuery.value = textC.text;
+            Get.back();
+          },
+          child: const Text("Cari"),
+        ),
+      ],
     ),
   );
 }

@@ -8,12 +8,57 @@ class HomeController extends GetxController {
   final user = FirebaseAuth.instance.currentUser;
   final isTopDrawerOpen = false.obs;
 
+  var selectedDate = DateTime.now().obs;
+  var startDate = Rxn<DateTime>();
+  var endDate = Rxn<DateTime>();
+  var searchQuery = ''.obs;
+  var allTransaksi = <dynamic>[].obs;
+
   void toggleDrawer() {
     isTopDrawerOpen.value = !isTopDrawerOpen.value;
   }
 
   void closeDrawer() {
     isTopDrawerOpen.value = false;
+  }
+
+  void bindTransaksiStream() {
+    ever(allTransaksi, (_) {
+      // optional trigger kalau mau
+    });
+
+    getTransaksiStream().listen((snapshot) {
+      allTransaksi.value = snapshot.docs;
+    });
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getTransaksiStream() {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      throw Exception("User belum login");
+    }
+
+    DateTime start;
+    DateTime end;
+
+    if (startDate.value != null && endDate.value != null) {
+      start = startDate.value!;
+      end = endDate.value!;
+    } else {
+      start = DateTime(selectedDate.value.year, selectedDate.value.month, 1);
+
+      end = DateTime(selectedDate.value.year, selectedDate.value.month + 1, 0);
+    }
+
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('transactions ')
+        .where("date", isGreaterThanOrEqualTo: start)
+        .where("date", isLessThanOrEqualTo: end)
+        .orderBy("date", descending: true)
+        .snapshots();
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>>? transaksiStream;
@@ -42,16 +87,13 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
 
-    if (user != null) {
-      transaksiStream = FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .collection("transactions ")
-          .orderBy("date", descending: true)
-          .snapshots();
-    }
-
     listenCategories();
+
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (user != null) {
+        bindTransaksiStream();
+      }
+    });
   }
 
   Future<void> deleteTransaction(String id) async {
