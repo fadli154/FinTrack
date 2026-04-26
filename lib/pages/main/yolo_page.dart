@@ -31,8 +31,8 @@ class _YoloPageState extends State<YoloPage>
   int lastTime = 0;
 
   double speechRate = 0.4;
-  double speakCooldown = 2500;
-  double confThreshold = 0.4;
+  double speakCooldown = 3000;
+  double confThreshold = 0.75;
 
   late AnimationController pulseController;
 
