@@ -165,39 +165,6 @@ class MyAccountPage extends StatelessWidget {
                 ),
               ],
             ),
-            Positioned(
-              right: 18,
-              bottom: 100,
-
-              child: GestureDetector(
-                onTap: () {
-                  Get.toNamed('/yolo');
-                },
-
-                child: Container(
-                  height: 62,
-                  width: 62,
-
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-
-                    gradient: LinearGradient(
-                      colors: [Colors.teal, Colors.tealAccent],
-                    ),
-
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: .25),
-                        blurRadius: 12,
-                        offset: Offset(0, 6),
-                      ),
-                    ],
-                  ),
-
-                  child: Icon(Icons.camera_alt, color: Colors.white, size: 30),
-                ),
-              ),
-            ),
           ],
         ),
       ),
