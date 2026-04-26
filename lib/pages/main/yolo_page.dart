@@ -170,40 +170,52 @@ class _YoloPageState extends State<YoloPage>
   }
 
   List<Widget> displayBoxes() {
-    if (yoloResults.isEmpty) return [];
+    if (yoloResults.isEmpty || controller == null) return [];
+
+    final screen = MediaQuery.of(context).size;
+
+    // ukuran image kamera yang dipakai model
+    final previewH = controller!.value.previewSize!.height;
+    final previewW = controller!.value.previewSize!.width;
+
+    // camera portrait biasanya kebalik
+    final scaleX = screen.width / previewH;
+    final scaleY = screen.height / previewW;
 
     return yoloResults.map((r) {
-      final box = r['box'];
+      final box = r["box"];
+
+      double x = box[0] * scaleX;
+      double y = box[1] * scaleY;
+      double w = box[2] * scaleX;
+      double h = box[3] * scaleY;
 
       return Positioned(
-        left: box[0],
-        top: box[1],
-        width: box[2],
-        height: box[3],
+        left: x,
+        top: y,
+        width: w,
+        height: h,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.greenAccent, width: 3),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.greenAccent.withValues(alpha: .5),
-                blurRadius: 12,
-              ),
-            ],
+            borderRadius: BorderRadius.circular(14),
           ),
+
           child: Align(
             alignment: Alignment.topLeft,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.greenAccent,
-                borderRadius: const BorderRadius.only(
+                borderRadius: BorderRadius.only(
                   bottomRight: Radius.circular(12),
                 ),
               ),
               child: Text(
-                r['tag'],
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                r["tag"],
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
