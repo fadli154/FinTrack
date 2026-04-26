@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_vision/flutter_vision.dart';
@@ -12,7 +13,8 @@ class YoloPage extends StatefulWidget {
   State<YoloPage> createState() => _YoloPageState();
 }
 
-class _YoloPageState extends State<YoloPage> {
+class _YoloPageState extends State<YoloPage>
+    with SingleTickerProviderStateMixin {
   CameraController? controller;
   late FlutterVision vision;
   late FlutterTts tts;
@@ -20,15 +22,29 @@ class _YoloPageState extends State<YoloPage> {
   bool isLoaded = false;
   bool isRealtime = false;
   bool isDetecting = false;
+  bool voiceEnabled = true;
 
   List<Map<String, dynamic>> yoloResults = [];
 
   String lastSpoken = "";
+  String latestDetected = "";
   int lastTime = 0;
+
+  double speechRate = 0.4;
+  double speakCooldown = 2500;
+  double confThreshold = 0.4;
+
+  late AnimationController pulseController;
 
   @override
   void initState() {
     super.initState();
+
+    pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+
     initYolo();
   }
 
@@ -37,13 +53,13 @@ class _YoloPageState extends State<YoloPage> {
     tts = FlutterTts();
 
     await tts.setLanguage("id-ID");
-    await tts.setSpeechRate(0.4);
+    await tts.setSpeechRate(speechRate);
 
     if (cameras.isEmpty) return;
 
     controller = CameraController(
       cameras.first,
-      ResolutionPreset.low,
+      ResolutionPreset.high,
       enableAudio: false,
     );
 
@@ -75,44 +91,59 @@ class _YoloPageState extends State<YoloPage> {
       isDetecting = true;
 
       try {
+        if (!mounted || !isRealtime) {
+          isDetecting = false;
+          return;
+        }
+
         final result = await vision.yoloOnFrame(
           bytesList: image.planes.map((e) => e.bytes).toList(),
           imageHeight: image.height,
           imageWidth: image.width,
           iouThreshold: 0.3,
-          confThreshold: 0.4,
-          classThreshold: 0.4,
+          confThreshold: confThreshold,
+          classThreshold: confThreshold,
         );
 
         if (mounted) {
           setState(() {
             yoloResults = result;
+
+            if (result.isNotEmpty) {
+              latestDetected = result.first['tag'];
+            }
           });
         }
 
-        if (result.isNotEmpty) {
-          speakResult(result.first["tag"]);
+        if (result.isNotEmpty && voiceEnabled) {
+          speakResult(result.first['tag']);
         }
       } catch (e) {
         debugPrint(e.toString());
       }
 
-      await Future.delayed(const Duration(milliseconds: 150));
+      if (mounted && isRealtime) {
+        await Future.delayed(Duration(milliseconds: 250));
+      }
 
       isDetecting = false;
     });
+
+    setState(() {});
   }
 
   Future<void> stopRealtime() async {
     isRealtime = false;
     await controller?.stopImageStream();
+    setState(() {});
   }
 
   Future<void> speakResult(String text) async {
     final now = DateTime.now().millisecondsSinceEpoch;
 
-    if (text != lastSpoken || now - lastTime > 2500) {
+    if (text != lastSpoken || now - lastTime > speakCooldown.toInt()) {
       await tts.stop();
+      await tts.setSpeechRate(speechRate);
       await tts.speak(text);
 
       lastSpoken = text;
@@ -120,11 +151,29 @@ class _YoloPageState extends State<YoloPage> {
     }
   }
 
+  Widget glassCard({required Widget child}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: .13),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: Colors.white.withValues(alpha: .2)),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+
   List<Widget> displayBoxes() {
     if (yoloResults.isEmpty) return [];
 
     return yoloResults.map((r) {
-      final box = r["box"];
+      final box = r['box'];
 
       return Positioned(
         left: box[0],
@@ -133,20 +182,28 @@ class _YoloPageState extends State<YoloPage> {
         height: box[3],
         child: Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.greenAccent, width: 2),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.greenAccent, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.greenAccent.withValues(alpha: .5),
+                blurRadius: 12,
+              ),
+            ],
           ),
           child: Align(
             alignment: Alignment.topLeft,
             child: Container(
-              padding: const EdgeInsets.all(4),
-              color: Colors.greenAccent,
-              child: Text(
-                r["tag"],
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.greenAccent,
+                borderRadius: const BorderRadius.only(
+                  bottomRight: Radius.circular(12),
                 ),
+              ),
+              child: Text(
+                r['tag'],
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -155,11 +212,249 @@ class _YoloPageState extends State<YoloPage> {
     }).toList();
   }
 
+  Widget buildTopHud() {
+    return Positioned(
+      top: 55,
+      left: 18,
+      right: 18,
+      child: Column(
+        children: [
+          glassCard(
+            child: Row(
+              children: [
+                AnimatedBuilder(
+                  animation: pulseController,
+                  builder: (context, _) {
+                    return Container(
+                      width: 14 + pulseController.value * 5,
+                      height: 14 + pulseController.value * 5,
+                      decoration: BoxDecoration(
+                        color: isRealtime ? Colors.greenAccent : Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                    );
+                  },
+                ),
+
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: Text(
+                    isRealtime
+                        ? 'Deteksi uang realtime aktif'
+                        : 'Deteksi berhenti',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+
+                Chip(
+                  backgroundColor: Colors.black12,
+                  label: Text(
+                    '${yoloResults.length} objek',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 14),
+        ],
+      ),
+    );
+  }
+
+  Widget buildControlPanel() {
+    return Positioned(
+      bottom: 60,
+      left: 16,
+      right: 16,
+      child: glassCard(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: _metric(
+                    'Voice',
+                    voiceEnabled ? 'ON' : 'OFF',
+                    Icons.volume_up,
+                  ),
+                ),
+                Expanded(
+                  child: _metric(
+                    'Speed',
+                    speechRate.toStringAsFixed(1),
+                    Icons.speed,
+                  ),
+                ),
+                Expanded(
+                  child: _metric(
+                    'Conf',
+                    confThreshold.toStringAsFixed(1),
+                    Icons.analytics,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 20),
+
+            _sliderTitle('Kecepatan suara', Icons.record_voice_over),
+
+            Slider(
+              value: speechRate,
+              min: 0.2,
+              max: 0.8,
+              onChanged: (v) async {
+                setState(() => speechRate = v);
+                await tts.setSpeechRate(v);
+              },
+            ),
+
+            _sliderTitle('Interval pengulangan suara', Icons.timer),
+
+            Slider(
+              value: speakCooldown,
+              min: 1000,
+              max: 5000,
+              divisions: 8,
+              onChanged: (v) {
+                setState(() => speakCooldown = v);
+              },
+            ),
+
+            _sliderTitle('Sensitivity detection', Icons.tune),
+
+            Slider(
+              value: confThreshold,
+              min: 0.2,
+              max: 0.9,
+              onChanged: (v) {
+                setState(() => confThreshold = v);
+              },
+            ),
+
+            const SizedBox(height: 10),
+
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        voiceEnabled = !voiceEnabled;
+                      });
+                    },
+                    icon: Icon(
+                      voiceEnabled ? Icons.volume_up : Icons.volume_off,
+                    ),
+                    label: const Text(
+                      'Voice',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 14),
+
+                Expanded(
+                  flex: 2,
+                  child: SizedBox(
+                    height: 40,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isRealtime ? Colors.red : Colors.green,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                      onPressed: () {
+                        if (isRealtime) {
+                          stopRealtime();
+                        } else {
+                          startRealtime();
+                        }
+                      },
+                      icon: Icon(
+                        isRealtime ? Icons.stop_circle : Icons.play_arrow,
+                        color: Colors.white,
+                      ),
+                      label: Text(
+                        isRealtime ? 'Stop Scan' : 'Start Scan',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _metric(String title, String value, IconData icon) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.white70),
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.greenAccent,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(title, style: const TextStyle(color: Colors.white54, fontSize: 8)),
+      ],
+    );
+  }
+
+  Widget _sliderTitle(String text, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.white70, size: 18),
+        const SizedBox(width: 8),
+        Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
-  void dispose() {
-    controller?.dispose();
-    vision.closeYoloModel();
-    tts.stop();
+  void dispose() async {
+    isRealtime = false;
+
+    if (controller?.value.isStreamingImages == true) {
+      await controller?.stopImageStream();
+    }
+
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    await controller?.dispose();
+
+    await vision.closeYoloModel();
+
+    await tts.stop();
+
     super.dispose();
   }
 
@@ -173,48 +468,13 @@ class _YoloPageState extends State<YoloPage> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          CameraPreview(controller!),
+          Positioned.fill(child: CameraPreview(controller!)),
 
           ...displayBoxes(),
 
-          Positioned(
-            top: 60,
-            left: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.black54,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Text(
-                "Deteksi Uang Realtime",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
-            ),
-          ),
+          buildTopHud(),
 
-          Positioned(
-            bottom: 80,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: FloatingActionButton(
-                backgroundColor: isRealtime ? Colors.red : Colors.green,
-                onPressed: () {
-                  if (isRealtime) {
-                    stopRealtime();
-                  } else {
-                    startRealtime();
-                  }
-
-                  setState(() {});
-                },
-                child: Icon(isRealtime ? Icons.stop : Icons.play_arrow),
-              ),
-            ),
-          ),
+          buildControlPanel(),
         ],
       ),
     );

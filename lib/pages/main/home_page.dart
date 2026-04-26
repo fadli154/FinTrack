@@ -1381,6 +1381,8 @@ class MyHomePage extends StatelessWidget {
                             try {
                               await controller.deleteTransaction(docId);
 
+                              Get.back();
+
                               showSnack(
                                 title: "Sukses",
                                 message: "Transaksi berhasil dihapus",
@@ -1434,7 +1436,7 @@ class MyHomePage extends StatelessWidget {
       SafeArea(
         bottom: true,
         child: FractionallySizedBox(
-          heightFactor: 0.8,
+          heightFactor: 0.95,
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
