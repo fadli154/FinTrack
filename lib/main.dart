@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:fintrack/bindings/auth_binding.dart';
 import 'package:fintrack/bindings/home_binding.dart';
 import 'package:fintrack/bindings/theme_binding.dart';
@@ -14,11 +15,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fintrack/bindings/page_binding.dart';
-// import 'package:fintrack/pages/main/home.dart';
 import 'package:fintrack/pages/main/main_page.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:fintrack/pages/main/yolo_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +27,8 @@ void main() async {
   await GetStorage.init();
 
   WidgetsFlutterBinding.ensureInitialized();
+
+  cameras = await availableCameras();
 
   Get.put(HomeController(), permanent: true);
   Get.put(ThemeController(), permanent: true);
@@ -114,6 +117,11 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/profile',
           page: () => MyAccountPage(title: 'FinTrack'),
+          bindings: [ThemeBinding()],
+        ),
+        GetPage(
+          name: '/yolo',
+          page: () => YoloPage(),
           bindings: [ThemeBinding()],
         ),
       ],

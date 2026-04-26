@@ -712,7 +712,7 @@ class MyHomePage extends StatelessWidget {
       SafeArea(
         bottom: true,
         child: FractionallySizedBox(
-          heightFactor: 0.9,
+          heightFactor: 0.7,
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -787,6 +787,51 @@ class MyHomePage extends StatelessWidget {
                     );
 
                     Get.back();
+                    Get.back();
+                    AwesomeDialog(
+                      context: Get.overlayContext!,
+                      dialogType: DialogType.success,
+                      animType: AnimType.scale,
+                      dialogBackgroundColor: colors.secondary,
+                      titleTextStyle: TextStyle(color: colors.tertiary),
+                      descTextStyle: TextStyle(color: colors.tertiary),
+                      dismissOnTouchOutside: false,
+
+                      body: Column(
+                        children: [
+                          Text(
+                            "Berhasil!",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: colors.tertiary,
+                            ),
+                          ),
+
+                          const SizedBox(height: 6),
+
+                          Text(
+                            "Transaksi berhasil diubah!",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: colors.tertiary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                      btnOkColor: colors.primary,
+
+                      btnOkOnPress: () async {
+                        try {
+                          Get.back();
+                        } catch (e) {
+                          showSnack(title: "Error", message: e.toString());
+                        }
+                      },
+                    ).show();
                   },
                   child: Text(
                     "Update",

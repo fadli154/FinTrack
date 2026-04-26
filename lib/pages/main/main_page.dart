@@ -575,11 +575,6 @@ void _showInputDialog(
                               btnOkOnPress: () async {
                                 try {
                                   Get.back();
-
-                                  showSnack(
-                                    title: "Sukses",
-                                    message: "Transaksi berhasil ditambahkan",
-                                  );
                                 } catch (e) {
                                   showSnack(
                                     title: "Error",
