@@ -807,7 +807,7 @@ class MyHomePage extends StatelessWidget {
       SafeArea(
         bottom: true,
         child: FractionallySizedBox(
-          heightFactor: 0.5,
+          heightFactor: 0.7,
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -1124,7 +1124,7 @@ class MyHomePage extends StatelessWidget {
       SafeArea(
         bottom: true,
         child: FractionallySizedBox(
-          heightFactor: 0.4,
+          heightFactor: 0.7,
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
