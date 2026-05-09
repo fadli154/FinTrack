@@ -1,10 +1,17 @@
+dua dollar 
+dua puluh dollar
 dua puluh ribu rupiah
 dua ratus perak koin
 dua ribu rupiah
+lima dollar
+lima puluh dollar
 lima puluh ribu rupiah
 lima ratus perak koin
 lima ribu rupiah
+satu dollar
+sepuluh dollar
 sepuluh ribu rupiah
+seratus dollar
 seratus perak koin
 seratus ribu rupiah
 seribu rupiah

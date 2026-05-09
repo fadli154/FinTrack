@@ -2,14 +2,16 @@ import 'package:fintrack/controllers/laporan_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:fintrack/services/pdf_service.dart';
+import 'package:printing/printing.dart';
 
 class LaporanPage extends StatelessWidget {
-  const LaporanPage({super.key});
+  LaporanPage({super.key});
+  final controller = Get.put(LaporanController());
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final controller = Get.put(LaporanController());
 
     return Scaffold(
       appBar: AppBar(toolbarHeight: 3, backgroundColor: colors.secondary),
@@ -36,125 +38,195 @@ class LaporanPage extends StatelessWidget {
               final totalSaldo =
                   controller.totalIncome.value - controller.totalExpense.value;
 
-              return ListView(
+              return Stack(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: colors.secondary,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 6,
-                        ),
-                      ],
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(30),
-                        bottomRight: Radius.circular(30),
-                      ),
-                    ),
-                    child: Center(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min, // 🔥 penting!
-                        children: [
-                          CircleAvatar(
-                            radius: 35,
-                            backgroundColor: colors.primary,
-                            child: Icon(
-                              Icons.account_balance_wallet_rounded,
-                              size: 40,
-                              color: colors.inverseSurface,
+                  ListView(
+                    padding: const EdgeInsets.only(bottom: 100),
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: colors.secondary,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 6,
                             ),
+                          ],
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(30),
+                            bottomRight: Radius.circular(30),
                           ),
-
-                          const SizedBox(width: 15),
-
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment:
-                                CrossAxisAlignment.center, // 🔥 center text
+                        ),
+                        child: Center(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min, // 🔥 penting!
                             children: [
-                              Text(
-                                "Saldo",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: colors.inversePrimary.withValues(
-                                    alpha: 0.7,
-                                  ),
+                              CircleAvatar(
+                                radius: 35,
+                                backgroundColor: colors.primary,
+                                child: Icon(
+                                  Icons.account_balance_wallet_rounded,
+                                  size: 40,
+                                  color: colors.inverseSurface,
                                 ),
                               ),
 
-                              const SizedBox(height: 4),
+                              const SizedBox(width: 15),
 
-                              Text(
-                                "Rp ${NumberFormat.decimalPattern('id').format(totalSaldo)}",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: colors.inversePrimary,
-                                ),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.center, // 🔥 center text
+                                children: [
+                                  Text(
+                                    "Saldo",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: colors.inversePrimary.withValues(
+                                        alpha: 0.7,
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 4),
+
+                                  Text(
+                                    "Rp ${NumberFormat.decimalPattern('id').format(totalSaldo)}",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: colors.inversePrimary,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                      horizontal: 20,
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                          horizontal: 20,
+                        ),
 
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 20),
-
-                        // 🔥 PEMASUKAN & PENGELUARAN
-                        Row(
+                        child: Column(
                           children: [
-                            Expanded(
-                              child: _card(
-                                "Pemasukan",
-                                controller.totalIncome.value,
-                                Colors.green,
-                                Icons.arrow_downward,
-                                context,
+                            const SizedBox(height: 20),
+
+                            // 🔥 PEMASUKAN & PENGELUARAN
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _card(
+                                    "Pemasukan",
+                                    controller.totalIncome.value,
+                                    Colors.green,
+                                    Icons.arrow_downward,
+                                    context,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _card(
+                                    "Pengeluaran",
+                                    controller.totalExpense.value,
+                                    Colors.red,
+                                    Icons.arrow_upward,
+                                    context,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 25),
+
+                            // 🔥 TITLE
+                            Text(
+                              "Ringkasan Kategori",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: colors.tertiary,
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _card(
-                                "Pengeluaran",
-                                controller.totalExpense.value,
-                                Colors.red,
-                                Icons.arrow_upward,
-                                context,
-                              ),
+
+                            const SizedBox(height: 20),
+
+                            // 🔥 LIST KATEGORI
+                            ...controller.categorySummary.entries.map((e) {
+                              return _listItem(e.key, e.value, context);
+                            }),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  Positioned(
+                    right: 18,
+                    bottom: MediaQuery.of(context).padding.bottom + 20,
+
+                    child: GestureDetector(
+                      onTap: () async {
+                        Get.dialog(
+                          const Center(child: CircularProgressIndicator()),
+                          barrierDismissible: false,
+                        );
+
+                        try {
+                          final bytes = await PdfService.generateLaporanPdf(
+                            totalIncome: controller.totalIncome.value,
+                            totalExpense: controller.totalExpense.value,
+                            categorySummary: controller.categorySummary,
+                          );
+
+                          Get.back();
+
+                          await Printing.sharePdf(
+                            bytes: bytes,
+                            filename: 'laporan_keuangan.pdf',
+                          );
+                        } catch (e) {
+                          Get.back();
+
+                          Get.snackbar(
+                            "Error",
+                            e.toString(),
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
+                          );
+                        }
+                      },
+
+                      child: Container(
+                        height: 62,
+                        width: 62,
+
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+
+                          gradient: const LinearGradient(
+                            colors: [Colors.red, Colors.orange],
+                          ),
+
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: .25),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
                             ),
                           ],
                         ),
 
-                        const SizedBox(height: 25),
-
-                        // 🔥 TITLE
-                        Text(
-                          "Ringkasan Kategori",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: colors.tertiary,
-                          ),
+                        child: const Icon(
+                          Icons.picture_as_pdf,
+                          color: Colors.white,
+                          size: 30,
                         ),
-
-                        const SizedBox(height: 20),
-
-                        // 🔥 LIST KATEGORI
-                        ...controller.categorySummary.entries.map((e) {
-                          return _listItem(e.key, e.value, context);
-                        }),
-                      ],
+                      ),
                     ),
                   ),
                 ],

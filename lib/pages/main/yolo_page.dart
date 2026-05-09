@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_vision/flutter_vision.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:get/get.dart';
 
 late List<CameraDescription> cameras;
 
@@ -23,6 +24,8 @@ class _YoloPageState extends State<YoloPage>
   bool isRealtime = false;
   bool isDetecting = false;
   bool voiceEnabled = true;
+  bool _isDisposing = false;
+  bool isClosing = false;
 
   List<Map<String, dynamic>> yoloResults = [];
 
@@ -86,16 +89,14 @@ class _YoloPageState extends State<YoloPage>
     isRealtime = true;
 
     controller!.startImageStream((image) async {
+      if (!mounted) return;
+      if (isClosing) return;
+
       if (!isRealtime || isDetecting) return;
 
       isDetecting = true;
 
       try {
-        if (!mounted || !isRealtime) {
-          isDetecting = false;
-          return;
-        }
-
         final result = await vision.yoloOnFrame(
           bytesList: image.planes.map((e) => e.bytes).toList(),
           imageHeight: image.height,
@@ -105,25 +106,24 @@ class _YoloPageState extends State<YoloPage>
           classThreshold: confThreshold,
         );
 
-        if (mounted) {
-          setState(() {
-            yoloResults = result;
-
-            if (result.isNotEmpty) {
-              latestDetected = result.first['tag'];
-            }
-          });
+        if (!mounted || isClosing) {
+          isDetecting = false;
+          return;
         }
+
+        setState(() {
+          yoloResults = result;
+
+          if (result.isNotEmpty) {
+            latestDetected = result.first['tag'];
+          }
+        });
 
         if (result.isNotEmpty && voiceEnabled) {
-          speakResult(result.first['tag']);
+          await speakResult(result.first['tag']);
         }
       } catch (e) {
-        debugPrint(e.toString());
-      }
-
-      if (mounted && isRealtime) {
-        await Future.delayed(Duration(milliseconds: 250));
+        debugPrint("YOLO ERROR: $e");
       }
 
       isDetecting = false;
@@ -452,20 +452,10 @@ class _YoloPageState extends State<YoloPage>
   }
 
   @override
-  void dispose() async {
-    isRealtime = false;
+  void dispose() {
+    cleanupCamera();
 
-    if (controller?.value.isStreamingImages == true) {
-      await controller?.stopImageStream();
-    }
-
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    await controller?.dispose();
-
-    await vision.closeYoloModel();
-
-    await tts.stop();
+    pulseController.dispose();
 
     super.dispose();
   }
@@ -476,19 +466,96 @@ class _YoloPageState extends State<YoloPage>
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          Positioned.fill(child: CameraPreview(controller!)),
+    return PopScope(
+      canPop: false,
 
-          ...displayBoxes(),
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
 
-          buildTopHud(),
+        await safeCloseCamera();
 
-          buildControlPanel(),
-        ],
+        if (!mounted) return;
+
+        Get.back();
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
+          children: [
+            Positioned.fill(child: CameraPreview(controller!)),
+
+            ...displayBoxes(),
+
+            buildTopHud(),
+
+            buildControlPanel(),
+          ],
+        ),
       ),
     );
+  }
+
+  Future<void> safeCloseCamera() async {
+    if (isClosing) return;
+
+    isClosing = true;
+
+    try {
+      // stop realtime dulu
+      isRealtime = false;
+
+      // tunggu inference selesai
+      while (isDetecting) {
+        await Future.delayed(const Duration(milliseconds: 50));
+      }
+
+      // baru stop stream
+      if (controller?.value.isStreamingImages == true) {
+        await controller?.stopImageStream();
+      }
+
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      // dispose camera
+      await controller?.dispose();
+
+      // tutup model
+      await vision.closeYoloModel();
+
+      // stop TTS
+      await tts.stop();
+    } catch (e) {
+      debugPrint("SAFE CLOSE ERROR: $e");
+    }
+  }
+
+  Future<void> cleanupCamera() async {
+    if (_isDisposing) return;
+
+    _isDisposing = true;
+
+    try {
+      isRealtime = false;
+      isDetecting = false;
+
+      // stop image stream dulu
+      if (controller?.value.isStreamingImages == true) {
+        await controller?.stopImageStream();
+      }
+
+      // kasih delay kecil biar callback terakhir selesai
+      await Future.delayed(const Duration(milliseconds: 200));
+
+      // dispose camera
+      await controller?.dispose();
+
+      // tutup yolo
+      await vision.closeYoloModel();
+
+      // stop suara
+      await tts.stop();
+    } catch (e) {
+      debugPrint("Cleanup error: $e");
+    }
   }
 }
