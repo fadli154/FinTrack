@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class ChartController extends GetxController {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -154,6 +155,27 @@ class ChartController extends GetxController {
   void changeFilter(String value) {
     selectedFilter.value = value;
     _recalculate();
+  }
+
+  String get periodLabel {
+    switch (selectedFilter.value) {
+      case 'today':
+        return 'Hari Ini';
+
+      case 'month':
+        return DateFormat('MMMM yyyy', 'id').format(DateTime.now());
+
+      case 'custom':
+        if (startDate.value != null && endDate.value != null) {
+          return '${DateFormat('dd MMM yyyy', 'id').format(startDate.value!)} - '
+              '${DateFormat('dd MMM yyyy', 'id').format(endDate.value!)}';
+        }
+        return 'Custom';
+
+      case 'all':
+      default:
+        return 'All time';
+    }
   }
 
   void setCustomDate(DateTime start, DateTime end) {

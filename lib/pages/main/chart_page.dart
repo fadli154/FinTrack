@@ -75,6 +75,16 @@ class ChartPage extends StatelessWidget {
                         ),
                       ],
                     ),
+
+                    const SizedBox(height: 8),
+
+                    Text(
+                      "Menampilkan: ${controller.periodLabel}",
+                      style: TextStyle(
+                        color: colors.tertiary.withValues(alpha: .75),
+                        fontSize: 12,
+                      ),
+                    ),
                     SingleChildScrollView(
                       padding: const EdgeInsets.only(top: 25),
                       scrollDirection: Axis.horizontal,

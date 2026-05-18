@@ -1,77 +1,219 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fintrack/controllers/home_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class LaporanController extends GetxController {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  final userId = FirebaseAuth.instance.currentUser!.uid;
+  final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
-  // 🔥 ambil categoryMap dari HomeController
-  late final HomeController homeController;
+  final totalIncome = 0.obs;
+  final totalExpense = 0.obs;
+  final isLoading = true.obs;
 
-  var totalIncome = 0.obs;
-  var totalExpense = 0.obs;
+  final selectedFilter = 'all'.obs;
+  final startDate = Rxn<DateTime>();
+  final endDate = Rxn<DateTime>();
 
-  var categorySummary = <String, int>{}.obs;
+  final categorySummary = <Map<String, dynamic>>[].obs;
 
-  // 🔥 stream transaksi
-  Stream<QuerySnapshot<Map<String, dynamic>>> get transaksiStream => firestore
-      .collection('users')
-      .doc(userId)
-      .collection('transactions ')
-      .snapshots();
+  final Map<String, Map<String, dynamic>> categoryMap = {};
+
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _trxSub;
+  List<QueryDocumentSnapshot<Map<String, dynamic>>> _transactions = [];
 
   @override
   void onInit() {
     super.onInit();
-
-    homeController = Get.find<HomeController>();
-
-    // ⚠️ pastikan categories sudah didengarkan
-    homeController.listenCategories();
+    _initController();
   }
 
-  // 🔥 helper ambil category data
-  Map<String, dynamic>? getCategory(String? categoryId) {
-    if (categoryId == null) return null;
-    return homeController.categoryMap[categoryId];
+  Future<void> _initController() async {
+    try {
+      isLoading.value = true;
+
+      if (userId == null) {
+        isLoading.value = false;
+        return;
+      }
+
+      await _loadCategories();
+
+      _trxSub = firestore
+          .collection('users')
+          .doc(userId)
+          .collection('transactions ')
+          .snapshots()
+          .listen(
+            (snapshot) {
+              _transactions = snapshot.docs;
+              _recalculate();
+            },
+            onError: (e) {
+              debugPrint('LaporanController trx error: $e');
+              isLoading.value = false;
+            },
+          );
+    } catch (e) {
+      debugPrint('LaporanController init error: $e');
+      isLoading.value = false;
+    }
   }
 
-  // 🔥 core logic laporan
-  void calculate(List<QueryDocumentSnapshot<Map<String, dynamic>>> docs) {
+  Future<void> _loadCategories() async {
+    final categorySnapshot = await firestore.collection('categories').get();
+    categoryMap.clear();
+
+    for (final doc in categorySnapshot.docs) {
+      categoryMap[doc.id] = doc.data();
+    }
+  }
+
+  DateTime? _toDate(dynamic raw) {
+    if (raw == null) return null;
+    if (raw is Timestamp) return raw.toDate();
+    if (raw is DateTime) return raw;
+    if (raw is String) return DateTime.tryParse(raw);
+    return null;
+  }
+
+  int _toInt(dynamic raw) {
+    if (raw == null) return 0;
+    if (raw is num) return raw.toInt();
+    return int.tryParse(raw.toString()) ?? 0;
+  }
+
+  void _recalculate() {
+    final now = DateTime.now();
+    final today = DateUtils.dateOnly(now);
+
     int income = 0;
     int expense = 0;
 
-    Map<String, int> summary = {};
+    final summary = <String, Map<String, dynamic>>{};
 
-    for (var doc in docs) {
+    for (final doc in _transactions) {
       final data = doc.data();
 
-      final amount = (data['amount'] as num?) ?? 0;
-      final categoryId = data['category'];
+      final transactionDate = _toDate(data['date']);
+      if (transactionDate == null) continue;
 
-      final categoryData = getCategory(categoryId);
+      final transactionDay = DateUtils.dateOnly(transactionDate);
 
-      final type = categoryData?['type']; // 🔥 ambil dari categories
-      final categoryName = categoryData?['name'] ?? 'Other';
+      bool includeData = true;
 
-      // 🔥 hitung income / expense
-      if (type == 'pemasukan') {
-        income += amount.toInt();
-      } else if (type == 'pengeluaran') {
-        expense += amount.toInt();
-      } else {
-        // fallback kalau belum ada category
-        expense += amount.toInt();
+      switch (selectedFilter.value) {
+        case 'today':
+          includeData = DateUtils.isSameDay(transactionDay, today);
+          break;
+
+        case 'month':
+          includeData =
+              transactionDay.year == now.year &&
+              transactionDay.month == now.month;
+          break;
+
+        case 'custom':
+          if (startDate.value != null && endDate.value != null) {
+            final start = DateUtils.dateOnly(startDate.value!);
+            final end = DateUtils.dateOnly(endDate.value!);
+
+            includeData =
+                !transactionDay.isBefore(start) && !transactionDay.isAfter(end);
+          } else {
+            includeData = false;
+          }
+          break;
+
+        case 'all':
+        default:
+          includeData = true;
       }
 
-      // 🔥 summary per kategori
-      summary[categoryName] = (summary[categoryName] ?? 0) + amount.toInt();
+      if (!includeData) continue;
+
+      final amount = _toInt(data['amount']);
+      final categoryId = data['category']?.toString();
+
+      final categoryData = categoryId != null ? categoryMap[categoryId] : null;
+      final type = (data['type'] ?? categoryData?['type'] ?? 'pengeluaran')
+          .toString();
+      final categoryName =
+          (categoryData?['name'] ?? data['categoryName'] ?? 'Lainnya')
+              .toString();
+
+      final key = categoryId ?? categoryName;
+
+      summary.putIfAbsent(key, () {
+        return {'name': categoryName, 'amount': 0, 'type': type};
+      });
+
+      summary[key]!['amount'] = (summary[key]!['amount'] as int) + amount;
+
+      if (type == 'pemasukan') {
+        income += amount;
+      } else {
+        expense += amount;
+      }
     }
 
     totalIncome.value = income;
     totalExpense.value = expense;
-    categorySummary.value = summary;
+    categorySummary.value = summary.values.toList()
+      ..sort((a, b) => (b['amount'] as int).compareTo(a['amount'] as int));
+
+    isLoading.value = false;
+  }
+
+  void changeFilter(String value) {
+    selectedFilter.value = value;
+
+    if (value != 'custom') {
+      startDate.value = null;
+      endDate.value = null;
+    }
+
+    _recalculate();
+  }
+
+  void setCustomDate(DateTime start, DateTime end) {
+    startDate.value = start;
+    endDate.value = end;
+    selectedFilter.value = 'custom';
+    _recalculate();
+  }
+
+  int get totalBalance => totalIncome.value - totalExpense.value;
+
+  bool get isEmpty =>
+      totalIncome.value == 0 &&
+      totalExpense.value == 0 &&
+      categorySummary.isEmpty;
+
+  String get periodLabel {
+    switch (selectedFilter.value) {
+      case 'today':
+        return 'Hari ini';
+      case 'month':
+        return DateFormat('MMMM yyyy', 'id').format(DateTime.now());
+      case 'custom':
+        if (startDate.value != null && endDate.value != null) {
+          return '${DateFormat('dd MMM yyyy', 'id').format(startDate.value!)} - ${DateFormat('dd MMM yyyy', 'id').format(endDate.value!)}';
+        }
+        return 'Custom';
+      default:
+        return 'All time';
+    }
+  }
+
+  List<Map<String, dynamic>> get sortedCategoryEntries => categorySummary;
+
+  @override
+  void onClose() {
+    _trxSub?.cancel();
+    super.onClose();
   }
 }
