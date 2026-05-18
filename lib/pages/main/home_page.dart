@@ -129,6 +129,13 @@ class MyHomePage extends StatelessWidget {
           color: colors.inverseSurface,
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_alt_off),
+            color: colors.inverseSurface,
+            onPressed: () {
+              controller.resetFilters();
+            },
+          ),
           // 🔥 DATE RANGE
           IconButton(
             icon: const Icon(Icons.date_range),
@@ -294,6 +301,36 @@ class MyHomePage extends StatelessWidget {
                   ),
                 ),
               ),
+            ),
+
+            Positioned(
+              bottom: 0,
+
+              child: Obx(() {
+                final hasFilter =
+                    controller.searchQuery.value.isNotEmpty ||
+                    controller.startDate.value != null ||
+                    controller.endDate.value != null;
+
+                if (!hasFilter) return const SizedBox();
+
+                return Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(20),
+                    ),
+                    color: Colors.teal.withValues(alpha: .1),
+                  ),
+
+                  child: Expanded(
+                    child: Text(
+                      "Filter Aktif",
+                      style: TextStyle(color: colors.tertiary),
+                    ),
+                  ),
+                );
+              }),
             ),
           ],
         ),

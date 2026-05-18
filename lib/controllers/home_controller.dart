@@ -188,4 +188,13 @@ class HomeController extends GetxController {
 
     return totals;
   }
+
+  void resetFilters() {
+    searchQuery.value = '';
+
+    startDate.value = null;
+    endDate.value = null;
+
+    selectedDate.value = DateTime.now();
+  }
 }
