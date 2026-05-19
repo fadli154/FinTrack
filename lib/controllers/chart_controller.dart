@@ -18,6 +18,10 @@ class ChartController extends GetxController {
   final startDate = Rxn<DateTime>();
   final endDate = Rxn<DateTime>();
 
+  final monthlyLabels = <String>[].obs;
+  final monthlyIncomeValues = <double>[].obs;
+  final monthlyExpenseValues = <double>[].obs;
+
   final Map<String, dynamic> categoryMap = {};
 
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _trxSub;
@@ -83,12 +87,20 @@ class ChartController extends GetxController {
     return double.tryParse(raw.toString()) ?? 0.0;
   }
 
+  DateTime _monthKey(DateTime date) => DateTime(date.year, date.month, 1);
+
+  DateTime _nextMonth(DateTime date) => DateTime(date.year, date.month + 1, 1);
+
   void _recalculate() {
     double totalIncome = 0;
     double totalExpense = 0;
 
     final now = DateTime.now();
     final today = DateUtils.dateOnly(now);
+
+    final monthlyBuckets = <DateTime, Map<String, double>>{};
+    DateTime? minMonth;
+    DateTime? maxMonth;
 
     for (final doc in _transactions) {
       final data = doc.data();
@@ -133,18 +145,56 @@ class ChartController extends GetxController {
 
       final categoryId = data['category']?.toString();
       final category = categoryId != null ? categoryMap[categoryId] : null;
-
       final type = (data['type'] ?? category?['type'])?.toString();
+
+      final monthKey = _monthKey(transactionDay);
+      monthlyBuckets.putIfAbsent(
+        monthKey,
+        () => {'income': 0.0, 'expense': 0.0},
+      );
 
       if (type == 'pemasukan') {
         totalIncome += amount;
+        monthlyBuckets[monthKey]!['income'] =
+            (monthlyBuckets[monthKey]!['income'] ?? 0) + amount;
       } else {
         totalExpense += amount;
+        monthlyBuckets[monthKey]!['expense'] =
+            (monthlyBuckets[monthKey]!['expense'] ?? 0) + amount;
       }
+
+      minMonth = minMonth == null || monthKey.isBefore(minMonth)
+          ? monthKey
+          : minMonth;
+      maxMonth = maxMonth == null || monthKey.isAfter(maxMonth)
+          ? monthKey
+          : maxMonth;
     }
 
     income.value = totalIncome;
     expense.value = totalExpense;
+
+    monthlyLabels.clear();
+    monthlyIncomeValues.clear();
+    monthlyExpenseValues.clear();
+
+    if (monthlyBuckets.isNotEmpty && minMonth != null && maxMonth != null) {
+      final months = <DateTime>[];
+      var cursor = DateTime(minMonth.year, minMonth.month, 1);
+      final last = DateTime(maxMonth.year, maxMonth.month, 1);
+
+      while (!cursor.isAfter(last)) {
+        months.add(cursor);
+        cursor = _nextMonth(cursor);
+      }
+
+      for (final month in months) {
+        monthlyLabels.add(DateFormat('MMM yy', 'id').format(month));
+        monthlyIncomeValues.add(monthlyBuckets[month]?['income'] ?? 0.0);
+        monthlyExpenseValues.add(monthlyBuckets[month]?['expense'] ?? 0.0);
+      }
+    }
+
     isLoading.value = false;
 
     debugPrint(
@@ -154,6 +204,7 @@ class ChartController extends GetxController {
 
   void changeFilter(String value) {
     selectedFilter.value = value;
+    touchedIndex.value = -1;
     _recalculate();
   }
 
@@ -178,10 +229,84 @@ class ChartController extends GetxController {
     }
   }
 
+  double get savingRate {
+    if (income.value <= 0) return 0;
+    return ((income.value - expense.value) / income.value) * 100;
+  }
+
+  double get expenseRatio {
+    if (income.value <= 0) return 0;
+    return (expense.value / income.value) * 100;
+  }
+
+  double get netCashflow => income.value - expense.value;
+
+  double get incomeExpenseRatio {
+    if (expense.value <= 0) return 0;
+    return (income.value / expense.value) * 100;
+  }
+
+  double get balancePercentage {
+    if (income.value <= 0) return 0;
+    return (netCashflow / income.value) * 100;
+  }
+
+  double get financialHealthScore {
+    if (income.value <= 0) return 0;
+
+    double score = 100;
+
+    if (expenseRatio > 80) {
+      score -= 40;
+    } else if (expenseRatio > 60) {
+      score -= 20;
+    }
+
+    if (savingRate > 30) {
+      score += 10;
+    }
+
+    return score.clamp(0, 100);
+  }
+
+  String get healthStatus {
+    final score = financialHealthScore;
+
+    if (score >= 80) return "Sangat Sehat 🟢";
+    if (score >= 60) return "Cukup Sehat 🟡";
+    if (score >= 40) return "Perlu Perhatian 🟠";
+    return "Bahaya 🔴";
+  }
+
+  String get financialInsight {
+    if (savingRate >= 50) {
+      return "Keuangan kamu sangat sehat 🔥";
+    }
+
+    if (savingRate >= 30) {
+      return "Bagus, pertahankan tabunganmu 👍";
+    }
+
+    if (savingRate >= 10) {
+      return "Pengeluaran mulai besar ⚠️";
+    }
+
+    return "Pengeluaran lebih besar dari pemasukan 🚨";
+  }
+
+  double get trendMaxY {
+    final values = <double>[...monthlyIncomeValues, ...monthlyExpenseValues];
+    if (values.isEmpty) return 1;
+
+    final maxValue = values.reduce((a, b) => a > b ? a : b);
+    return maxValue <= 0 ? 1 : maxValue * 1.25;
+  }
+
   void setCustomDate(DateTime start, DateTime end) {
     startDate.value = start;
     endDate.value = end;
     selectedFilter.value = 'custom';
+    touchedIndex.value = -1;
     _recalculate();
   }
 
