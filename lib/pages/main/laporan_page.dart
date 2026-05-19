@@ -94,19 +94,19 @@ class LaporanPage extends StatelessWidget {
                             children: [
                               _filterChip(
                                 "All Time",
-                                "all",
+                                ReportFilter.all,
                                 controller,
                                 context,
                               ),
                               _filterChip(
                                 "Hari Ini",
-                                "today",
+                                ReportFilter.today,
                                 controller,
                                 context,
                               ),
                               _filterChip(
                                 "Bulan Ini",
-                                "month",
+                                ReportFilter.month,
                                 controller,
                                 context,
                               ),
@@ -176,7 +176,7 @@ class LaporanPage extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color:
                                         controller.selectedFilter.value ==
-                                            'custom'
+                                            ReportFilter.custom
                                         ? Colors.teal
                                         : Colors.grey.withValues(alpha: .15),
                                     borderRadius: BorderRadius.circular(30),
@@ -186,7 +186,7 @@ class LaporanPage extends StatelessWidget {
                                     style: TextStyle(
                                       color:
                                           controller.selectedFilter.value ==
-                                              'custom'
+                                              ReportFilter.custom
                                           ? Colors.white
                                           : colors.tertiary,
                                       fontWeight: FontWeight.bold,
@@ -281,6 +281,164 @@ class LaporanPage extends StatelessWidget {
                             ],
                           ),
                         ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: colors.secondary,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: .08),
+                                blurRadius: 10,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    const Icon(
+                                      Icons.trending_down,
+                                      color: Colors.green,
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      currency.format(controller.averageIncome),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.green,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    const Text(
+                                      "Rata-rata Income",
+                                      style: TextStyle(fontSize: 11),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Container(
+                                width: 1,
+                                height: 50,
+                                color: Colors.grey.withValues(alpha: .2),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    const Icon(
+                                      Icons.trending_up,
+                                      color: Colors.red,
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      currency.format(
+                                        controller.averageExpense,
+                                      ),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    const Text(
+                                      "Rata-rata Expense",
+                                      style: TextStyle(fontSize: 11),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: colors.secondary,
+                            borderRadius: BorderRadius.circular(22),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: .08),
+                                blurRadius: 10,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    const Icon(
+                                      Icons.receipt_long,
+                                      color: Colors.blue,
+                                      size: 28,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      "${controller.totalTransactionCount}",
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: colors.tertiary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      "Total Transaksi",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: colors.tertiary.withValues(
+                                          alpha: .7,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: 1,
+                                height: 70,
+                                color: Colors.grey.withValues(alpha: .2),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    const Icon(
+                                      Icons.analytics_outlined,
+                                      color: Colors.orange,
+                                      size: 28,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      currency.format(
+                                        controller.averageTransaction,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: colors.tertiary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      "Rata-rata",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: colors.tertiary.withValues(
+                                          alpha: .7,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                         const SizedBox(height: 20),
                         Align(
                           alignment: Alignment.centerLeft,
@@ -311,7 +469,7 @@ class LaporanPage extends StatelessWidget {
                             child: Column(
                               children: [
                                 const SizedBox(height: 18),
-                                Icon(
+                                const Icon(
                                   Icons.inbox_outlined,
                                   size: 72,
                                   color: Colors.grey,
@@ -326,7 +484,7 @@ class LaporanPage extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                Text(
+                                const Text(
                                   "Coba ubah filter tanggalnya",
                                   style: TextStyle(color: Colors.grey),
                                 ),
@@ -343,6 +501,194 @@ class LaporanPage extends StatelessWidget {
                               context,
                             );
                           }),
+                        const SizedBox(height: 24),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Riwayat Transaksi",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: colors.tertiary,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        if (controller.transactionGroups.isEmpty)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: colors.secondary,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Center(
+                              child: Text("Belum ada transaksi"),
+                            ),
+                          )
+                        else
+                          ...controller.displayedTransactionGroups.map((group) {
+                            final transactions =
+                                group['transactions']
+                                    as List<Map<String, dynamic>>;
+
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 18),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: colors.secondary,
+                                borderRadius: BorderRadius.circular(22),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: .05),
+                                    blurRadius: 8,
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        group['date'].toString(),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                          color: colors.tertiary,
+                                        ),
+                                      ),
+
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            "+ ${currency.format(group['income'])}",
+                                            style: const TextStyle(
+                                              color: Colors.green,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            "- ${currency.format(group['expense'])}",
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 14),
+
+                                  Divider(
+                                    color: Colors.grey.withValues(alpha: .3),
+                                    thickness: 1,
+                                  ),
+                                  const SizedBox(height: 14),
+
+                                  ...transactions.map((trx) {
+                                    final isIncome = trx['type'] == 'pemasukan';
+
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 12,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            width: 42,
+                                            height: 42,
+                                            decoration: BoxDecoration(
+                                              color: isIncome
+                                                  ? Colors.green.withValues(
+                                                      alpha: .12,
+                                                    )
+                                                  : Colors.red.withValues(
+                                                      alpha: .12,
+                                                    ),
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                            ),
+                                            child: Icon(
+                                              isIncome
+                                                  ? Icons.south_west
+                                                  : Icons.north_east,
+                                              color: isIncome
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  trx['title'],
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: colors.tertiary,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  trx['category'],
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: colors.tertiary
+                                                        .withValues(alpha: .65),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Text(
+                                            "${isIncome ? '+' : '-'} ${currency.format(trx['amount'])}",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: isIncome
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              ),
+                            );
+                          }),
+
+                        if (controller.hasMoreData)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: controller.loadMoreTransactions,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.teal,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+                                child: const Text(
+                                  "Muat Lebih Banyak",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -418,7 +764,7 @@ class LaporanPage extends StatelessWidget {
 
   Widget _filterChip(
     String title,
-    String value,
+    ReportFilter value,
     LaporanController controller,
     BuildContext context,
   ) {
