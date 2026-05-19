@@ -21,6 +21,7 @@ class ChartController extends GetxController {
   final monthlyLabels = <String>[].obs;
   final monthlyIncomeValues = <double>[].obs;
   final monthlyExpenseValues = <double>[].obs;
+  final topExpenseCategories = <Map<String, dynamic>>[].obs;
 
   final Map<String, dynamic> categoryMap = {};
 
@@ -99,6 +100,7 @@ class ChartController extends GetxController {
     final today = DateUtils.dateOnly(now);
 
     final monthlyBuckets = <DateTime, Map<String, double>>{};
+    final categoryExpenseMap = <String, double>{};
     DateTime? minMonth;
     DateTime? maxMonth;
 
@@ -155,12 +157,19 @@ class ChartController extends GetxController {
 
       if (type == 'pemasukan') {
         totalIncome += amount;
+
         monthlyBuckets[monthKey]!['income'] =
             (monthlyBuckets[monthKey]!['income'] ?? 0) + amount;
       } else {
         totalExpense += amount;
+
         monthlyBuckets[monthKey]!['expense'] =
             (monthlyBuckets[monthKey]!['expense'] ?? 0) + amount;
+
+        final categoryName = category?['name']?.toString() ?? 'Lainnya';
+
+        categoryExpenseMap[categoryName] =
+            (categoryExpenseMap[categoryName] ?? 0) + amount;
       }
 
       minMonth = minMonth == null || monthKey.isBefore(minMonth)
@@ -173,6 +182,14 @@ class ChartController extends GetxController {
 
     income.value = totalIncome;
     expense.value = totalExpense;
+
+    final sortedCategories = categoryExpenseMap.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    topExpenseCategories.value = sortedCategories
+        .take(5)
+        .map((e) => {'name': e.key, 'amount': e.value})
+        .toList();
 
     monthlyLabels.clear();
     monthlyIncomeValues.clear();

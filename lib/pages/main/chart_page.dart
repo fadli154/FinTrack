@@ -734,6 +734,167 @@ class ChartPage extends StatelessWidget {
                               ),
                             ],
                           ),
+
+                          const SizedBox(height: 16),
+
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: colors.secondary,
+                              borderRadius: BorderRadius.circular(25),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: .08),
+                                  blurRadius: 10,
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.local_fire_department,
+                                      color: Colors.orange,
+                                    ),
+
+                                    const SizedBox(width: 10),
+
+                                    Text(
+                                      "Top Kategori Pengeluaran",
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: colors.tertiary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 20),
+
+                                if (controller.topExpenseCategories.isEmpty)
+                                  Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 20,
+                                      ),
+                                      child: Text(
+                                        "Belum ada data pengeluaran",
+                                        style: TextStyle(
+                                          color: colors.tertiary.withValues(
+                                            alpha: .7,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  Column(
+                                    children: List.generate(
+                                      controller.topExpenseCategories.length,
+                                      (index) {
+                                        final item = controller
+                                            .topExpenseCategories[index];
+
+                                        final amount = item['amount'] as double;
+                                        final double percent =
+                                            controller.expense.value <= 0
+                                            ? 0
+                                            : (amount /
+                                                  controller.expense.value);
+
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 16,
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 28,
+                                                        height: 28,
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.orange
+                                                              .withValues(
+                                                                alpha: .12,
+                                                              ),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                10,
+                                                              ),
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            "${index + 1}",
+                                                            style:
+                                                                const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 12,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+
+                                                      const SizedBox(width: 10),
+
+                                                      Text(
+                                                        item['name'],
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color:
+                                                              colors.tertiary,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+
+                                                  Text(
+                                                    currency.format(amount),
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.red,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+
+                                              const SizedBox(height: 8),
+
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                child: LinearProgressIndicator(
+                                                  value: percent,
+                                                  minHeight: 10,
+                                                  backgroundColor: Colors.grey
+                                                      .withValues(alpha: .15),
+                                                  valueColor:
+                                                      const AlwaysStoppedAnimation(
+                                                        Colors.orange,
+                                                      ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
