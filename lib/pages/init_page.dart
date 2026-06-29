@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fintrack/core/models/app_mode.dart';
 import 'package:fintrack/core/models/user_role.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -29,7 +30,11 @@ class InitPage extends StatelessWidget {
       if (doc.exists) {
         final data = doc.data() ?? {};
         final role = UserRole.fromString(data['role'] as String?);
-        if (role.isAdmin) return 'admin';
+        if (role.isAdmin) {
+          // Respect app_mode — admins may choose to use the user shell
+          final appMode = AppMode.fromString(data['app_mode'] as String?);
+          return appMode.isAdmin ? 'admin' : 'main';
+        }
       }
     } catch (_) {
       // Firestore error — fall back to normal user shell

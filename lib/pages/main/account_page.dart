@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use
+import 'package:fintrack/controllers/user_controller.dart';
 import 'package:fintrack/controllers/thme_controller.dart';
+import 'package:fintrack/core/models/app_mode.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -175,6 +177,127 @@ class MyAccountPage extends StatelessWidget {
                     ],
                   ),
                 ),
+
+                const SizedBox(height: 16),
+
+                // ─── Admin Mode Switcher (admin users only) ──────────────
+                Obx(() {
+                  final userCtrl = Get.find<UserController>();
+                  if (!userCtrl.isAdmin) return const SizedBox.shrink();
+                  final currentMode = userCtrl.currentAppMode;
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: colors.surface.withValues(alpha: .1),
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color: colors.surface.withValues(alpha: .3),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.admin_panel_settings_rounded,
+                                  color: colors.surface,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'current_mode'.tr,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: colors.tertiary,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: colors.surface.withValues(alpha: .15),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    currentMode.isAdmin
+                                        ? 'mode_admin'.tr
+                                        : 'mode_user'.tr,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: colors.surface,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          RadioListTile<AppMode>(
+                            dense: true,
+                            title: Row(
+                              children: [
+                                Icon(Icons.admin_panel_settings,
+                                    size: 16, color: colors.surface),
+                                const SizedBox(width: 8),
+                                Text('mode_admin'.tr,
+                                    style: TextStyle(color: colors.tertiary)),
+                              ],
+                            ),
+                            value: AppMode.admin,
+                            groupValue: currentMode,
+                            activeColor: colors.surface,
+                            onChanged: (v) {
+                              if (v != null && v != currentMode) {
+                                userCtrl.switchAppMode(v);
+                              }
+                            },
+                          ),
+                          RadioListTile<AppMode>(
+                            dense: true,
+                            title: Row(
+                              children: [
+                                Icon(Icons.person_outline_rounded,
+                                    size: 16,
+                                    color:
+                                        colors.tertiary.withValues(alpha: .7)),
+                                const SizedBox(width: 8),
+                                Text('mode_user'.tr,
+                                    style: TextStyle(color: colors.tertiary)),
+                              ],
+                            ),
+                            value: AppMode.user,
+                            groupValue: currentMode,
+                            activeColor: colors.surface,
+                            onChanged: (v) {
+                              if (v != null && v != currentMode) {
+                                userCtrl.switchAppMode(v);
+                              }
+                            },
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                            child: Text(
+                              'switch_mode_desc'.tr,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: colors.tertiary.withValues(alpha: .5),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+
+                const SizedBox(height: 30),
               ],
             ),
           ],

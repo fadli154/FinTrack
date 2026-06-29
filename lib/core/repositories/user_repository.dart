@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fintrack/core/models/app_mode.dart';
 import 'package:fintrack/core/models/app_user.dart';
 import 'package:fintrack/core/models/user_role.dart';
 import 'package:fintrack/core/models/user_status.dart';
@@ -49,6 +50,10 @@ class UserRepository {
     await updateUser(uid, {'status': status.toJson()});
   }
 
+  static Future<void> setAppMode(String uid, AppMode mode) async {
+    await updateUser(uid, {'app_mode': mode.toJson()});
+  }
+
   static Future<void> deleteUser(String uid) async {
     await _col.doc(uid).delete();
   }
@@ -73,12 +78,12 @@ class UserRepository {
     final doc = await ref.get();
 
     if (!doc.exists) {
-      // Brand new user (shouldn't normally happen via this path)
       await ref.set({
         'name': name,
         'email': email,
         'role': UserRole.user.toJson(),
         'status': UserStatus.active.toJson(),
+        'app_mode': AppMode.user.toJson(),
         'language': 'en',
         'currency': 'IDR',
         'photo_url': null,
@@ -101,6 +106,13 @@ class UserRepository {
       if (!data.containsKey('currency')) updates['currency'] = 'IDR';
       if (!data.containsKey('photo_url')) updates['photo_url'] = null;
 
+      // Migrate app_mode — default based on role
+      if (!data.containsKey('app_mode')) {
+        final role = UserRole.fromString(data['role'] as String?);
+        updates['app_mode'] =
+            role.isAdmin ? AppMode.admin.toJson() : AppMode.user.toJson();
+      }
+
       await ref.update(updates);
     }
 
@@ -112,18 +124,38 @@ class UserRepository {
 
   static final _cats = _db.collection('categories');
 
+  /// Default values for missing fields — ensures backward compatibility.
+  static Map<String, dynamic> _normalizeCategory(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>? ?? {};
+    return {
+      'id': doc.id,
+      'name': data['name'] as String? ?? 'Category',
+      'type': data['type'] as String? ?? 'pengeluaran',
+      'icon': data['icon'] as String? ?? '📦',
+      'color': data['color'] as String? ?? '#9E9E9E',
+      // Preserve any extra fields
+      ...data,
+    };
+  }
+
   static Stream<List<Map<String, dynamic>>> watchGlobalCategories() {
     return _cats.orderBy('name').snapshots().map(
-          (snap) => snap.docs
-              .map((d) => {'id': d.id, ...d.data()})
-              .toList(),
+          (snap) => snap.docs.map(_normalizeCategory).toList(),
         );
   }
 
-  static Future<void> addGlobalCategory(String name, String icon) async {
+  /// Add a global category with all required fields.
+  static Future<void> addGlobalCategory({
+    required String name,
+    required String type,
+    required String icon,
+    required String color,
+  }) async {
     await _cats.add({
       'name': name,
+      'type': type,
       'icon': icon,
+      'color': color,
       'created_at': FieldValue.serverTimestamp(),
     });
   }

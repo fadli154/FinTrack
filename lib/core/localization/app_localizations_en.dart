@@ -220,4 +220,27 @@ const Map<String, String> enUS = {
 
   // Navigation extras
   'switch_to_user_app': 'Switch to User App',
+
+  // Mode Switch
+  'mode_admin': 'Admin Mode',
+  'mode_user': 'User Mode',
+  'current_mode': 'Current Mode',
+  'switch_mode_desc': 'Switching mode changes the layout and access features of the application, but you remain logged in as the same Admin account.',
+
+  // Charts & Analytics
+  'chart_analytics': 'Analytics',
+  'chart_user_status': 'User Status Breakdown',
+  'chart_user_status_sub': 'Active vs disabled accounts',
+  'chart_user_growth': 'User Growth (Last 6 Months)',
+  'chart_income_expense': 'Total Income vs Expense',
+  'chart_categories': 'Most Used Categories',
+  'chart_categories_sub': 'Top categories by total amount',
+  'analytics_last_6_months': 'Overview for the last 6 months',
+  'no_data': 'No analytics data available',
+  
+  // Category fields
+  'category_type': 'Category Type',
+  'type_income': 'Income',
+  'type_expense': 'Expense',
+  'category_color': 'Color Swatch',
 };

@@ -220,4 +220,27 @@ const Map<String, String> idID = {
 
   // Navigasi tambahan
   'switch_to_user_app': 'Beralih ke Aplikasi Pengguna',
+
+  // Mode Switch
+  'mode_admin': 'Mode Admin',
+  'mode_user': 'Mode Pengguna',
+  'current_mode': 'Mode Saat Ini',
+  'switch_mode_desc': 'Beralih mode mengubah tata letak dan fitur akses aplikasi, tetapi Anda tetap masuk sebagai akun Admin yang sama.',
+
+  // Charts & Analytics
+  'chart_analytics': 'Analisis',
+  'chart_user_status': 'Rincian Status Pengguna',
+  'chart_user_status_sub': 'Akun aktif vs dinonaktifkan',
+  'chart_user_growth': 'Pertumbuhan Pengguna (6 Bulan Terakhir)',
+  'chart_income_expense': 'Total Pemasukan vs Pengeluaran',
+  'chart_categories': 'Kategori Paling Sering Digunakan',
+  'chart_categories_sub': 'Kategori teratas berdasarkan jumlah total',
+  'analytics_last_6_months': 'Ikhtisar untuk 6 bulan terakhir',
+  'no_data': 'Data analisis tidak tersedia',
+  
+  // Category fields
+  'category_type': 'Tipe Kategori',
+  'type_income': 'Pemasukan',
+  'type_expense': 'Pengeluaran',
+  'category_color': 'Pilihan Warna',
 };
