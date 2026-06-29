@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fintrack/core/models/user_role.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,9 +16,26 @@ class InitPage extends StatelessWidget {
 
     final user = FirebaseAuth.instance.currentUser;
 
-    if (!onboardingDone) return "intro";
-    if (user != null) return "main";
-    return "login";
+    if (!onboardingDone) return 'intro';
+    if (user == null) return 'login';
+
+    // Check role to decide which shell to show
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (doc.exists) {
+        final data = doc.data() ?? {};
+        final role = UserRole.fromString(data['role'] as String?);
+        if (role.isAdmin) return 'admin';
+      }
+    } catch (_) {
+      // Firestore error — fall back to normal user shell
+    }
+
+    return 'main';
   }
 
   @override
@@ -31,12 +50,15 @@ class InitPage extends StatelessWidget {
         }
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (snapshot.data == "intro") {
-            Get.offAllNamed('/intro');
-          } else if (snapshot.data == "main") {
-            Get.offAllNamed('/main');
-          } else {
-            Get.offAllNamed('/login');
+          switch (snapshot.data) {
+            case 'intro':
+              Get.offAllNamed('/intro');
+            case 'admin':
+              Get.offAllNamed('/admin');
+            case 'main':
+              Get.offAllNamed('/main');
+            default:
+              Get.offAllNamed('/login');
           }
         });
 

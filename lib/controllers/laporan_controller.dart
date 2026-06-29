@@ -218,7 +218,7 @@ class LaporanController extends GetxController {
           .fold<int>(0, (total, trx) => total + (trx['amount'] as int));
 
       return {
-        'date': DateFormat('EEEE, dd MMM yyyy', 'id').format(e.key),
+        'date': DateFormat('EEEE, dd MMM yyyy', Get.locale?.languageCode ?? 'en').format(e.key),
         'income': incomeTotal,
         'expense': expenseTotal,
         'transactions': transactions,
@@ -273,19 +273,19 @@ class LaporanController extends GetxController {
   String get periodLabel {
     switch (selectedFilter.value) {
       case ReportFilter.today:
-        return 'Hari ini';
+        return 'filter_today'.tr;
 
       case ReportFilter.month:
-        return DateFormat('MMMM yyyy', 'id').format(DateTime.now());
+        return DateFormat('MMMM yyyy', Get.locale?.languageCode ?? 'en').format(DateTime.now());
 
       case ReportFilter.custom:
         if (startDate.value != null && endDate.value != null) {
-          return '${DateFormat('dd MMM yyyy', 'id').format(startDate.value!)} - ${DateFormat('dd MMM yyyy', 'id').format(endDate.value!)}';
+          return '${DateFormat('dd MMM yyyy', Get.locale?.languageCode ?? 'en').format(startDate.value!)} - ${DateFormat('dd MMM yyyy', Get.locale?.languageCode ?? 'en').format(endDate.value!)}';
         }
-        return 'Custom';
+        return 'filter_custom'.tr;
 
       case ReportFilter.all:
-        return 'All Time';
+        return 'filter_all_time'.tr;
     }
   }
 

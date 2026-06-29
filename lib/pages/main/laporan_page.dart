@@ -14,7 +14,7 @@ class LaporanPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final currency = NumberFormat.currency(
-      locale: 'id',
+      locale: Get.locale?.languageCode ?? 'id',
       symbol: 'Rp ',
       decimalDigits: 0,
     );
@@ -70,7 +70,7 @@ class LaporanPage extends StatelessWidget {
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              "Laporan",
+                              "report_title".tr,
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
@@ -81,7 +81,7 @@ class LaporanPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          "Menampilkan: ${controller.periodLabel}",
+                          "report_showing".trParams({'period': controller.periodLabel}),
                           style: TextStyle(
                             color: colors.tertiary.withValues(alpha: .75),
                             fontSize: 12,
@@ -93,19 +93,19 @@ class LaporanPage extends StatelessWidget {
                           child: Row(
                             children: [
                               _filterChip(
-                                "All Time",
+                                "filter_all_time".tr,
                                 ReportFilter.all,
                                 controller,
                                 context,
                               ),
                               _filterChip(
-                                "Hari Ini",
+                                "filter_today".tr,
                                 ReportFilter.today,
                                 controller,
                                 context,
                               ),
                               _filterChip(
-                                "Bulan Ini",
+                                "filter_month".tr,
                                 ReportFilter.month,
                                 controller,
                                 context,
@@ -182,7 +182,7 @@ class LaporanPage extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   child: Text(
-                                    "Custom",
+                                    "filter_custom".tr,
                                     style: TextStyle(
                                       color:
                                           controller.selectedFilter.value ==
@@ -225,7 +225,7 @@ class LaporanPage extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: _summaryCard(
-                                      "Pemasukan",
+                                      "income".tr,
                                       income,
                                       Colors.green,
                                       Icons.arrow_downward,
@@ -236,7 +236,7 @@ class LaporanPage extends StatelessWidget {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: _summaryCard(
-                                      "Pengeluaran",
+                                      "expense".tr,
                                       expense,
                                       Colors.red,
                                       Icons.arrow_upward,
@@ -257,7 +257,7 @@ class LaporanPage extends StatelessWidget {
                                 child: Column(
                                   children: [
                                     Text(
-                                      "Saldo",
+                                      "balance".tr,
                                       style: TextStyle(
                                         color: colors.tertiary.withValues(
                                           alpha: .75,
@@ -312,9 +312,9 @@ class LaporanPage extends StatelessWidget {
                                       ),
                                     ),
                                     const SizedBox(height: 4),
-                                    const Text(
-                                      "Rata-rata Income",
-                                      style: TextStyle(fontSize: 11),
+                                    Text(
+                                      "average_income".tr,
+                                      style: const TextStyle(fontSize: 11),
                                     ),
                                   ],
                                 ),
@@ -343,9 +343,9 @@ class LaporanPage extends StatelessWidget {
                                       ),
                                     ),
                                     const SizedBox(height: 4),
-                                    const Text(
-                                      "Rata-rata Expense",
-                                      style: TextStyle(fontSize: 11),
+                                    Text(
+                                      "average_expense".tr,
+                                      style: const TextStyle(fontSize: 11),
                                     ),
                                   ],
                                 ),
@@ -387,7 +387,7 @@ class LaporanPage extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      "Total Transaksi",
+                                      "total_transactions".tr,
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: colors.tertiary.withValues(
@@ -425,7 +425,7 @@ class LaporanPage extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      "Rata-rata",
+                                      "average_amount".tr,
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: colors.tertiary.withValues(
@@ -443,7 +443,7 @@ class LaporanPage extends StatelessWidget {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Ringkasan Kategori",
+                            "category_summary".tr,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -476,7 +476,7 @@ class LaporanPage extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  "Belum ada data pada filter ini",
+                                  "empty_reports".tr,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -484,9 +484,9 @@ class LaporanPage extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                const Text(
-                                  "Coba ubah filter tanggalnya",
-                                  style: TextStyle(color: Colors.grey),
+                                Text(
+                                  "change_filter_hint".tr,
+                                  style: const TextStyle(color: Colors.grey),
                                 ),
                                 const SizedBox(height: 18),
                               ],
@@ -505,7 +505,7 @@ class LaporanPage extends StatelessWidget {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Riwayat Transaksi",
+                            "transaction_history".tr,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -522,8 +522,8 @@ class LaporanPage extends StatelessWidget {
                               color: colors.secondary,
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Center(
-                              child: Text("Belum ada transaksi"),
+                            child: Center(
+                              child: Text("no_transactions".tr),
                             ),
                           )
                         else
@@ -682,9 +682,9 @@ class LaporanPage extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(14),
                                   ),
                                 ),
-                                child: const Text(
-                                  "Muat Lebih Banyak",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                child: Text(
+                                  "load_more".tr,
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
@@ -711,20 +711,20 @@ class LaporanPage extends StatelessWidget {
                         categorySummary: controller.categorySummary,
                         reportDate: DateTime.now(),
                         periodLabel: controller.periodLabel,
-                        title: 'Laporan Keuangan',
+                        title: 'financial_report'.tr,
                       );
 
                       Get.back();
 
                       await Printing.sharePdf(
                         bytes: bytes,
-                        filename: 'laporan_keuangan.pdf',
+                        filename: 'pdf_filename'.tr,
                       );
                     } catch (e) {
                       Get.back();
 
                       Get.snackbar(
-                        "Error",
+                        "error".tr,
                         e.toString(),
                         backgroundColor: Colors.red,
                         colorText: Colors.white,
@@ -877,7 +877,7 @@ class LaporanPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              isIncome ? 'Pemasukan' : 'Pengeluaran',
+              isIncome ? 'income'.tr : 'expense'.tr,
               style: TextStyle(
                 fontSize: 11,
                 color: accent,
@@ -888,7 +888,7 @@ class LaporanPage extends StatelessWidget {
           const SizedBox(width: 10),
           Text(
             NumberFormat.currency(
-              locale: 'id',
+              locale: Get.locale?.languageCode ?? 'id',
               symbol: 'Rp ',
               decimalDigits: 0,
             ).format(amount),

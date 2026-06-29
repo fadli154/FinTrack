@@ -50,12 +50,12 @@ class MyMainPage extends StatelessWidget {
 
           style: TabStyle.fixedCircle,
 
-          items: const [
-            TabItem(icon: Icons.event_note, title: 'Riwayat'),
-            TabItem(icon: Icons.pie_chart, title: 'Grafik'),
-            TabItem(icon: Icons.camera_alt_rounded, title: 'Camera'),
-            TabItem(icon: Icons.receipt_long_rounded, title: 'Laporan'),
-            TabItem(icon: Icons.person_outline_sharp, title: 'Saya'),
+          items: [
+            TabItem(icon: Icons.event_note, title: 'nav_history'.tr),
+            TabItem(icon: Icons.pie_chart, title: 'nav_charts'.tr),
+            TabItem(icon: Icons.camera_alt_rounded, title: 'nav_camera'.tr),
+            TabItem(icon: Icons.receipt_long_rounded, title: 'nav_reports'.tr),
+            TabItem(icon: Icons.person_outline_sharp, title: 'nav_me'.tr),
           ],
 
           onTap: (int i) {

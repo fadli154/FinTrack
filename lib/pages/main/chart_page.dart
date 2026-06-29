@@ -13,7 +13,7 @@ class ChartPage extends StatelessWidget {
     final controller = Get.put(ChartController());
 
     final currency = NumberFormat.currency(
-      locale: 'id',
+      locale: Get.locale?.languageCode ?? 'id',
       symbol: 'Rp ',
       decimalDigits: 0,
     );
@@ -66,7 +66,7 @@ class ChartPage extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          "Statistik",
+                          "charts_title".tr,
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -79,7 +79,7 @@ class ChartPage extends StatelessWidget {
                     const SizedBox(height: 8),
 
                     Text(
-                      "Menampilkan: ${controller.periodLabel}",
+                      "report_showing".trParams({'period': controller.periodLabel}),
                       style: TextStyle(
                         color: colors.tertiary.withValues(alpha: .75),
                         fontSize: 12,
@@ -90,10 +90,10 @@ class ChartPage extends StatelessWidget {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          _filterChip("All Time", "all", controller, context),
-                          _filterChip("Hari Ini", "today", controller, context),
+                          _filterChip("filter_all_time".tr, "all", controller, context),
+                          _filterChip("filter_today".tr, "today", controller, context),
                           _filterChip(
-                            "Bulan Ini",
+                            "filter_month".tr,
                             "month",
                             controller,
                             context,
@@ -207,7 +207,7 @@ class ChartPage extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(30),
                               ),
                               child: Text(
-                                "Custom",
+                                "filter_custom".tr,
                                 style: TextStyle(
                                   color:
                                       controller.selectedFilter.value ==
@@ -259,7 +259,7 @@ class ChartPage extends StatelessWidget {
                                 const SizedBox(height: 20),
 
                                 Text(
-                                  "Belum ada data pada filter ini",
+                                  "empty_reports".tr,
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: colors.tertiary,
@@ -270,8 +270,8 @@ class ChartPage extends StatelessWidget {
                                 const SizedBox(height: 10),
 
                                 Text(
-                                  "Coba ganti filter tanggal",
-                                  style: TextStyle(color: Colors.grey),
+                                  "change_filter_hint".tr,
+                                  style: const TextStyle(color: Colors.grey),
                                 ),
 
                                 const SizedBox(height: 40),
@@ -329,7 +329,7 @@ class ChartPage extends StatelessWidget {
                                 const SizedBox(height: 20),
 
                                 _legend(
-                                  "Pemasukan",
+                                  "income".tr,
                                   income,
                                   Colors.green,
                                   currency,
@@ -337,7 +337,7 @@ class ChartPage extends StatelessWidget {
                                 ),
 
                                 _legend(
-                                  "Pengeluaran",
+                                  "expense".tr,
                                   expense,
                                   Colors.red,
                                   currency,
@@ -365,7 +365,7 @@ class ChartPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Income vs Expense",
+                            "income_vs_expense".tr,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -376,7 +376,7 @@ class ChartPage extends StatelessWidget {
                           const SizedBox(height: 25),
 
                           _modernBar(
-                            title: "Pemasukan",
+                            title: "income".tr,
                             value: income,
                             total: total,
                             color: Colors.green,
@@ -386,7 +386,7 @@ class ChartPage extends StatelessWidget {
                           const SizedBox(height: 20),
 
                           _modernBar(
-                            title: "Pengeluaran",
+                            title: "expense".tr,
                             value: expense,
                             total: total,
                             color: Colors.red,
@@ -404,7 +404,7 @@ class ChartPage extends StatelessWidget {
                         children: [
                           Expanded(
                             child: _statsCard(
-                              "Income Ratio",
+                              "income_ratio".tr,
                               "${controller.incomeExpenseRatio.toStringAsFixed(1)}%",
                               Icons.account_balance_wallet,
                               Colors.cyan,
@@ -415,7 +415,7 @@ class ChartPage extends StatelessWidget {
 
                           Expanded(
                             child: _statsCard(
-                              "Expense Ratio",
+                              "expense_ratio".tr,
                               "${controller.expenseRatio.toStringAsFixed(1)}%",
                               Icons.pie_chart,
                               Colors.orange,
@@ -431,7 +431,7 @@ class ChartPage extends StatelessWidget {
                       children: [
                         Expanded(
                           child: _summaryCard(
-                            "Pemasukan",
+                            "income".tr,
                             income,
                             Colors.green,
                             Icons.arrow_downward,
@@ -441,7 +441,7 @@ class ChartPage extends StatelessWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: _summaryCard(
-                            "Pengeluaran",
+                            "expense".tr,
                             expense,
                             Colors.red,
                             Icons.arrow_upward,
@@ -457,7 +457,7 @@ class ChartPage extends StatelessWidget {
                       children: [
                         Expanded(
                           child: _summaryCard(
-                            "Net Balance",
+                            "net_balance".tr,
                             controller.netCashflow,
                             controller.netCashflow >= 0
                                 ? Colors.teal
@@ -506,7 +506,7 @@ class ChartPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Trend Bulanan",
+                                "monthly_trend".tr,
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -526,7 +526,7 @@ class ChartPage extends StatelessWidget {
                           const SizedBox(height: 6),
 
                           Text(
-                            "Pergerakan pemasukan dan pengeluaran per bulan",
+                            "monthly_trend_desc".tr,
                             style: TextStyle(
                               fontSize: 12,
                               color: colors.tertiary.withValues(alpha: .6),
@@ -552,7 +552,7 @@ class ChartPage extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 10),
                                   Text(
-                                    "Data belum cukup untuk trend bulanan",
+                                    "monthly_trend_empty".tr,
                                     style: TextStyle(
                                       color: colors.tertiary,
                                       fontWeight: FontWeight.w600,
@@ -560,7 +560,7 @@ class ChartPage extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    "Coba pilih filter All Time atau rentang tanggal yang lebih panjang",
+                                    "monthly_trend_empty_desc".tr,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontSize: 12,
@@ -618,7 +618,7 @@ class ChartPage extends StatelessWidget {
 
                                           return Text(
                                             NumberFormat.compact(
-                                              locale: 'id',
+                                              locale: Get.locale?.languageCode ?? 'id',
                                             ).format(value),
                                             style: TextStyle(
                                               fontSize: 10,
@@ -719,7 +719,7 @@ class ChartPage extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: _trendLegend(
-                                  "Pemasukan",
+                                  "income".tr,
                                   Colors.green,
                                   context,
                                 ),
@@ -727,7 +727,7 @@ class ChartPage extends StatelessWidget {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: _trendLegend(
-                                  "Pengeluaran",
+                                  "expense".tr,
                                   Colors.red,
                                   context,
                                 ),
@@ -767,7 +767,7 @@ class ChartPage extends StatelessWidget {
                               const SizedBox(width: 10),
 
                               Text(
-                                "Top Kategori Pengeluaran",
+                                "top_categories".tr,
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -786,7 +786,7 @@ class ChartPage extends StatelessWidget {
                                   vertical: 20,
                                 ),
                                 child: Text(
-                                  "Belum ada data pengeluaran",
+                                  "top_categories_empty".tr,
                                   style: TextStyle(
                                     color: colors.tertiary.withValues(
                                       alpha: .7,

@@ -104,7 +104,7 @@ class LoginPage extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.only(top: 80, bottom: 20),
                           child: Text(
-                            "Login here",
+                            "login_here".tr,
                             style: GoogleFonts.poppins(
                               textStyle: TextStyle(
                                 color: colors.surface,
@@ -120,7 +120,7 @@ class LoginPage extends StatelessWidget {
                           width: 260,
                           child: Text(
                             textAlign: TextAlign.center,
-                            "Welcome back you've been missed!",
+                            "welcome_back".tr,
                             style: GoogleFonts.poppins(
                               textStyle: TextStyle(
                                 color: colors.tertiary,
@@ -139,7 +139,7 @@ class LoginPage extends StatelessWidget {
                           style: TextStyle(color: colors.onSurface),
 
                           decoration: InputDecoration(
-                            labelText: "Email",
+                            labelText: "email".tr,
 
                             filled: true,
                             fillColor: colors.surface.withValues(alpha: .35),
@@ -194,7 +194,7 @@ class LoginPage extends StatelessWidget {
                             style: TextStyle(color: colors.onSurface),
 
                             decoration: InputDecoration(
-                              labelText: "Password",
+                              labelText: "password".tr,
 
                               filled: true,
                               fillColor: colors.surface.withValues(alpha: .35),
@@ -260,8 +260,8 @@ class LoginPage extends StatelessWidget {
                             onPressed: () {
                               if (emailC.text.isEmpty) {
                                 authC.showSnack(
-                                  title: "Error",
-                                  message: "Masukkan email dulu",
+                                  title: "error".tr,
+                                  message: "enter_email_first".tr,
                                   isError: true,
                                 );
                                 return;
@@ -270,7 +270,7 @@ class LoginPage extends StatelessWidget {
                               authC.forgotPassword(emailC.text);
                             },
                             child: Text(
-                              "Forgot Your Password?",
+                              "forgot_password_q".tr,
                               style: GoogleFonts.poppins(
                                 textStyle: TextStyle(
                                   color: colors.surface,
@@ -324,7 +324,7 @@ class LoginPage extends StatelessWidget {
                                         color: Colors.white,
                                       )
                                     : Text(
-                                        "Login",
+                                        "login".tr,
                                         style: GoogleFonts.poppins(
                                           textStyle: TextStyle(
                                             fontSize: 16,
@@ -347,11 +347,11 @@ class LoginPage extends StatelessWidget {
                           style: ButtonStyle(),
                           child: RichText(
                             text: TextSpan(
-                              text: "Belum punya akun? ",
+                              text: "dont_have_account".tr,
                               style: TextStyle(color: colors.tertiary),
                               children: [
                                 TextSpan(
-                                  text: "Register",
+                                  text: "register".tr,
                                   style: GoogleFonts.poppins(
                                     textStyle: TextStyle(
                                       color: colors.surface,
@@ -367,7 +367,7 @@ class LoginPage extends StatelessWidget {
                         const SizedBox(height: 50),
 
                         Text(
-                          'Or continue with',
+                          "or_continue_with".tr,
                           style: GoogleFonts.poppins(
                             textStyle: TextStyle(
                               color: colors.tertiary,

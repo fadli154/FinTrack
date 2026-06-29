@@ -206,7 +206,7 @@ class ChartController extends GetxController {
       }
 
       for (final month in months) {
-        monthlyLabels.add(DateFormat('MMM yy', 'id').format(month));
+        monthlyLabels.add(DateFormat('MMM yy', Get.locale?.languageCode ?? 'en').format(month));
         monthlyIncomeValues.add(monthlyBuckets[month]?['income'] ?? 0.0);
         monthlyExpenseValues.add(monthlyBuckets[month]?['expense'] ?? 0.0);
       }
@@ -228,21 +228,21 @@ class ChartController extends GetxController {
   String get periodLabel {
     switch (selectedFilter.value) {
       case 'today':
-        return 'Hari Ini';
+        return 'filter_today'.tr;
 
       case 'month':
-        return DateFormat('MMMM yyyy', 'id').format(DateTime.now());
+        return DateFormat('MMMM yyyy', Get.locale?.languageCode ?? 'en').format(DateTime.now());
 
       case 'custom':
         if (startDate.value != null && endDate.value != null) {
-          return '${DateFormat('dd MMM yyyy', 'id').format(startDate.value!)} - '
-              '${DateFormat('dd MMM yyyy', 'id').format(endDate.value!)}';
+          return '${DateFormat('dd MMM yyyy', Get.locale?.languageCode ?? 'en').format(startDate.value!)} - '
+              '${DateFormat('dd MMM yyyy', Get.locale?.languageCode ?? 'en').format(endDate.value!)}';
         }
-        return 'Custom';
+        return 'filter_custom'.tr;
 
       case 'all':
       default:
-        return 'All time';
+        return 'filter_all_time'.tr;
     }
   }
 
@@ -289,26 +289,26 @@ class ChartController extends GetxController {
   String get healthStatus {
     final score = financialHealthScore;
 
-    if (score >= 80) return "Sangat Sehat 🟢";
-    if (score >= 60) return "Cukup Sehat 🟡";
-    if (score >= 40) return "Perlu Perhatian 🟠";
-    return "Bahaya 🔴";
+    if (score >= 80) return "health_very_healthy".tr;
+    if (score >= 60) return "health_healthy".tr;
+    if (score >= 40) return "health_needs_attention".tr;
+    return "health_danger".tr;
   }
 
   String get financialInsight {
     if (savingRate >= 50) {
-      return "Keuangan kamu sangat sehat 🔥";
+      return "insight_very_healthy".tr;
     }
 
     if (savingRate >= 30) {
-      return "Bagus, pertahankan tabunganmu 👍";
+      return "insight_healthy".tr;
     }
 
     if (savingRate >= 10) {
-      return "Pengeluaran mulai besar ⚠️";
+      return "insight_warning".tr;
     }
 
-    return "Pengeluaran lebih besar dari pemasukan 🚨";
+    return "insight_danger".tr;
   }
 
   double get trendMaxY {

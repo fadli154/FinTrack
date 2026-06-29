@@ -4,12 +4,16 @@ import 'package:fintrack/bindings/home_binding.dart';
 import 'package:fintrack/bindings/theme_binding.dart';
 import 'package:fintrack/controllers/home_controller.dart';
 import 'package:fintrack/controllers/thme_controller.dart';
+import 'package:fintrack/controllers/user_controller.dart';
+import 'package:fintrack/core/guards/role_guard.dart';
+import 'package:fintrack/pages/admin/admin_shell_page.dart';
 import 'package:fintrack/pages/auth/login_page.dart';
 import 'package:fintrack/pages/auth/register_page.dart';
 import 'package:fintrack/pages/init_page.dart';
 import 'package:fintrack/pages/introduction_page.dart';
 import 'package:fintrack/pages/main/account_page.dart';
 import 'package:fintrack/pages/main/laporan_page.dart';
+import 'package:fintrack/pages/unauthorized_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +24,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:fintrack/pages/main/yolo_page.dart';
+import 'package:fintrack/core/localization/app_localizations.dart';
+import 'package:fintrack/core/localization/localization_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,8 +38,10 @@ void main() async {
 
   Get.put(HomeController(), permanent: true);
   Get.put(ThemeController(), permanent: true);
+  Get.put(UserController(), permanent: true);
 
   await initializeDateFormatting('id', null); // 🔥 WAJIB
+  await initializeDateFormatting('en', null);
   runApp(MyApp());
 }
 
@@ -46,7 +54,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'FinTrack',
+      locale: LocalizationService.currentLocale,
+      fallbackLocale: LocalizationService.fallbackLocale,
+      translations: AppLocalizations(),
       theme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
@@ -123,6 +134,16 @@ class MyApp extends StatelessWidget {
           name: '/yolo',
           page: () => YoloPage(),
           bindings: [ThemeBinding()],
+        ),
+        GetPage(
+          name: '/admin',
+          page: () => const AdminShellPage(),
+          middlewares: [RoleGuard()],
+          bindings: [AuthBinding()],
+        ),
+        GetPage(
+          name: '/unauthorized',
+          page: () => const UnauthorizedPage(),
         ),
       ],
     );

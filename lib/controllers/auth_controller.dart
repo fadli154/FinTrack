@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:fintrack/core/models/user_role.dart';
+import 'package:fintrack/core/models/user_status.dart';
+import 'package:fintrack/core/services/auth_service.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -18,17 +21,17 @@ class AuthController extends GetxController {
   String getErrorMessage(String code) {
     switch (code) {
       case 'user-not-found':
-        return 'Email tidak terdaftar';
+        return 'error_user_not_found'.tr;
       case 'wrong-password':
-        return 'Password salah';
+        return 'error_wrong_password'.tr;
       case 'invalid-email':
-        return 'Format email tidak valid';
+        return 'error_invalid_email'.tr;
       case 'email-already-in-use':
-        return 'Email sudah digunakan';
+        return 'error_email_already_in_use'.tr;
       case 'weak-password':
-        return 'Password terlalu lemah (min 6 karakter)';
+        return 'error_weak_password'.tr;
       default:
-        return 'Terjadi kesalahan, coba lagi';
+        return 'error_default'.tr;
     }
   }
 
@@ -52,7 +55,7 @@ class AuthController extends GetxController {
       duration: const Duration(seconds: 3),
       mainButton: TextButton(
         onPressed: () => Get.back(),
-        child: const Text("Tutup", style: TextStyle(color: Colors.white)),
+        child: Text("close".tr, style: const TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -67,8 +70,8 @@ class AuthController extends GetxController {
 
       if (result.docs.isEmpty) {
         showSnack(
-          title: "Error",
-          message: "Email tidak terdaftar",
+          title: "error".tr,
+          message: "error_user_not_found".tr,
           isError: true,
         );
         return;
@@ -77,12 +80,12 @@ class AuthController extends GetxController {
       await _auth.sendPasswordResetEmail(email: email);
 
       showSnack(
-        title: "Berhasil",
-        message: "Link reset password dikirim ke email",
+        title: "success".tr,
+        message: "password_reset_sent".tr,
       );
     } on FirebaseAuthException catch (e) {
       showSnack(
-        title: "Error",
+        title: "error".tr,
         message: getErrorMessage(e.code),
         isError: true,
       );
@@ -105,22 +108,29 @@ class AuthController extends GetxController {
           .set({
             'name': name,
             'email': email,
+            'role': UserRole.user.toJson(),
+            'status': UserStatus.active.toJson(),
+            'language': 'en',
+            'currency': 'IDR',
+            'photo_url': null,
             'created_at': FieldValue.serverTimestamp(),
+            'updated_at': FieldValue.serverTimestamp(),
+            'last_login': FieldValue.serverTimestamp(),
           });
 
-      showSnack(title: "Berhasil", message: "Akun berhasil dibuat");
+      showSnack(title: "success".tr, message: "account_created".tr);
 
       Get.offAllNamed('/init');
     } on FirebaseAuthException catch (e) {
       showSnack(
-        title: "Error",
+        title: "error".tr,
         message: getErrorMessage(e.code),
         isError: true,
       );
     } catch (e) {
       showSnack(
-        title: "Error",
-        message: "Gagal simpan data user",
+        title: "error".tr,
+        message: "save_user_failed".tr,
         isError: true,
       );
     } finally {
@@ -133,15 +143,24 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
 
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      final credential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-      showSnack(title: "Berhasil", message: "Login sukses");
+      final appUser = await AuthService.postLogin(credential.user!);
 
-      Get.offAllNamed('/init');
+      showSnack(title: "success".tr, message: "login_success".tr);
+
+      if (appUser.isAdmin) {
+        Get.offAllNamed('/admin');
+      } else {
+        Get.offAllNamed('/main');
+      }
     } catch (e) {
       showSnack(
-        title: "Error",
-        message: "Email atau password salah",
+        title: "error".tr,
+        message: "login_failed".tr,
         isError: true,
       );
     } finally {
@@ -153,7 +172,7 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     await _auth.signOut();
 
-    showSnack(title: "Logout", message: "Berhasil keluar");
+    showSnack(title: "drawer_logout".tr, message: "logout_success".tr);
 
     Get.offAllNamed('/login');
   }
@@ -192,11 +211,17 @@ class AuthController extends GetxController {
         idToken: googleAuth.idToken,
       );
 
-      await _auth.signInWithCredential(credential);
+      final result = await _auth.signInWithCredential(credential);
 
-      Get.offAllNamed('/init');
+      final appUser = await AuthService.postLogin(result.user!);
+
+      if (appUser.isAdmin) {
+        Get.offAllNamed('/admin');
+      } else {
+        Get.offAllNamed('/main');
+      }
     } catch (e) {
-      showSnack(title: "Error", message: "Login Google gagal", isError: true);
+      showSnack(title: "error".tr, message: "google_login_failed".tr, isError: true);
     } finally {
       isLoading.value = false;
     }

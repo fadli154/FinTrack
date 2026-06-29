@@ -61,11 +61,11 @@ class TopDrawerContent extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
+             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5.0),
               child: ListTile(
                 leading: Icon(Icons.home, color: colors.tertiary),
-                title: Text("Home", style: TextStyle(color: colors.tertiary)),
+                title: Text("drawer_home".tr, style: TextStyle(color: colors.tertiary)),
                 onTap: controller.closeDrawer,
               ),
             ),
@@ -76,7 +76,7 @@ class TopDrawerContent extends StatelessWidget {
               child: ListTile(
                 leading: Icon(Icons.person, color: colors.tertiary),
                 title: Text(
-                  "Profile",
+                  "drawer_profile".tr,
                   style: TextStyle(color: colors.tertiary),
                 ),
                 onTap: () {
@@ -91,9 +91,9 @@ class TopDrawerContent extends StatelessWidget {
 
               child: ListTile(
                 leading: const Icon(Icons.logout, color: Colors.red),
-                title: const Text(
-                  "Logout",
-                  style: TextStyle(color: Colors.red),
+                title: Text(
+                  "drawer_logout".tr,
+                  style: const TextStyle(color: Colors.red),
                 ),
                 onTap: authC.logout,
               ),

@@ -36,7 +36,7 @@ class HomeController extends GetxController {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      throw Exception("User belum login");
+      throw Exception("user_not_logged_in".tr);
     }
 
     DateTime start;
@@ -150,7 +150,7 @@ class HomeController extends GetxController {
     for (var doc in docs) {
       final data = doc.data();
       final date = (data['date'] as Timestamp).toDate();
-      final key = DateFormat('d MMM, EEEE', 'id_ID').format(date);
+      final key = DateFormat('d MMM, EEEE', Get.locale?.languageCode ?? 'en').format(date);
 
       if (!grouped.containsKey(key)) {
         grouped[key] = [];

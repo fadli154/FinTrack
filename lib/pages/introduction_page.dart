@@ -145,27 +145,27 @@ class IntroductionPage extends StatelessWidget {
 
               pages: [
                 _buildPage(
-                  title: "Track Your Money",
+                  title: "intro_title_1".tr,
                   body:
-                      "Easily manage your income and expenses, and take full control of your financial life.",
+                      "intro_body_1".tr,
                   lottie: 'assets/lotties/MoneyInvestment.json',
                 ),
                 _buildPage(
-                  title: "Smart Financial Insights",
+                  title: "intro_title_2".tr,
                   body:
-                      "Discover where your money goes and improve your habits with smart insights.",
+                      "intro_body_2".tr,
                   lottie: 'assets/lotties/Revenue.json',
                 ),
               ],
 
               showSkipButton: true,
-              skip: const Text("Skip", style: TextStyle(color: Colors.black)),
+              skip: Text("skip".tr, style: const TextStyle(color: Colors.black)),
 
               next: const Icon(Icons.arrow_forward, color: Colors.black),
 
-              done: const Text(
-                "Start",
-                style: TextStyle(
+              done: Text(
+                "start".tr,
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),

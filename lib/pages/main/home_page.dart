@@ -25,7 +25,7 @@ class MyHomePage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: colors.primary,
         title: Obx(() {
-          final monthFormat = DateFormat('MMM', 'id_ID');
+          final monthFormat = DateFormat('MMM', Get.locale?.languageCode ?? 'en');
           final year = controller.selectedDate.value.year;
           final month = monthFormat.format(controller.selectedDate.value);
 
@@ -325,7 +325,7 @@ class MyHomePage extends StatelessWidget {
 
                   child: Expanded(
                     child: Text(
-                      "Filter Aktif",
+                      "active_filter".tr,
                       style: TextStyle(color: colors.tertiary),
                     ),
                   ),
@@ -349,7 +349,7 @@ class MyHomePage extends StatelessWidget {
 
         // ❌ belum login
         if (!authSnapshot.hasData) {
-          return const Center(child: Text("User belum login"));
+          return Center(child: Text("user_not_logged_in".tr));
         }
 
         return Obx(
@@ -363,7 +363,7 @@ class MyHomePage extends StatelessWidget {
             stream: controller.getTransaksiStream(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
-                return Center(child: Text("Error: ${snapshot.error}"));
+                return Center(child: Text("error_prefix".trParams({'error': snapshot.error.toString()})));
               }
 
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -424,7 +424,7 @@ class MyHomePage extends StatelessWidget {
                                       ),
                                     ),
                                     Text(
-                                      "Pemasukan: Rp ${NumberFormat.decimalPattern('id').format(totals[dateKey] ?? 0)}",
+                                      "${'income'.tr}: Rp ${NumberFormat.decimalPattern(Get.locale?.languageCode ?? 'id').format(totals[dateKey] ?? 0)}",
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
@@ -550,7 +550,7 @@ class MyHomePage extends StatelessWidget {
                                         ),
 
                                         Text(
-                                          "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern('id').format(amount)}",
+                                          "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern(Get.locale?.languageCode ?? 'id').format(amount)}",
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 15,
@@ -611,7 +611,7 @@ class MyHomePage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Tambahkan",
+                        "add".tr,
                         style: GoogleFonts.poppins(
                           textStyle: TextStyle(
                             fontSize: 17,
@@ -655,8 +655,8 @@ class MyHomePage extends StatelessWidget {
                       dividerColor: Color.fromARGB(0, 217, 217, 217),
                       unselectedLabelColor: colors.tertiary,
                       tabs: [
-                        Tab(text: "Pengeluaran"),
-                        Tab(text: "Pemasukan"),
+                        Tab(text: "expense".tr),
+                        Tab(text: "income".tr),
                       ],
                     ),
                   ),
@@ -726,7 +726,7 @@ class MyHomePage extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      "Tambah",
+                      "add".tr,
                       style: TextStyle(fontSize: 11, color: colors.tertiary),
                     ),
                   ],
@@ -793,25 +793,25 @@ class MyHomePage extends StatelessWidget {
       animType: AnimType.scale,
       dialogBackgroundColor: colors.secondary,
 
-      title: "Hapus Kategori",
-      desc: "Yakin mau hapus '$title'?",
+      title: "delete_category".tr,
+      desc: "delete_category_q".trParams({'title': title}),
 
       titleTextStyle: TextStyle(color: colors.tertiary),
       descTextStyle: TextStyle(color: colors.tertiary),
 
-      btnCancelText: "Batal",
+      btnCancelText: "cancel".tr,
       btnCancelColor: colors.primary,
 
-      btnOkText: "Hapus",
+      btnOkText: "delete".tr,
       btnOkColor: Colors.red,
 
       btnOkOnPress: () async {
         try {
           await controller.deleteCategory(categoryId);
 
-          showSnack(title: "Sukses", message: "Kategori berhasil dihapus");
+          showSnack(title: "success".tr, message: "category_deleted".tr);
         } catch (e) {
-          showSnack(title: "Error", message: e.toString(), isError: true);
+          showSnack(title: "error".tr, message: e.toString(), isError: true);
         }
       },
     ).show();
@@ -914,7 +914,7 @@ class MyHomePage extends StatelessWidget {
                   inputFormatters: [CurrencyInputFormatter()],
                   style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
-                    hintText: "Rp 0",
+                    hintText: "amount_hint".tr,
                     hintStyle: const TextStyle(color: Colors.grey),
                     filled: true,
                     fillColor: const Color.fromARGB(217, 245, 245, 245),
@@ -933,7 +933,7 @@ class MyHomePage extends StatelessWidget {
                   style: const TextStyle(color: Colors.black),
 
                   decoration: InputDecoration(
-                    hintText: "Catatan",
+                    hintText: "note_hint".tr,
                     hintStyle: const TextStyle(color: Colors.grey),
                     filled: true,
                     fillColor: const Color.fromARGB(213, 245, 245, 245),
@@ -950,7 +950,7 @@ class MyHomePage extends StatelessWidget {
                 Obx(
                   () => ListTile(
                     title: Text(
-                      "Tanggal: ${selectedDate.value.toString().split(' ')[0]}",
+                      "date_label".trParams({'date': selectedDate.value.toString().split(' ')[0]}),
                       style: TextStyle(color: colors.tertiary),
                     ),
                     trailing: Icon(
@@ -1069,7 +1069,7 @@ class MyHomePage extends StatelessWidget {
                                 body: Column(
                                   children: [
                                     Text(
-                                      "Berhasil!",
+                                      "success".tr,
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
@@ -1080,7 +1080,7 @@ class MyHomePage extends StatelessWidget {
                                     const SizedBox(height: 6),
 
                                     Text(
-                                      "Transaksi berhasil ditambahkan",
+                                      "transaction_added".tr,
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: colors.tertiary,
@@ -1114,7 +1114,7 @@ class MyHomePage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text("Simpan"),
+                      child: Text("save".tr),
                     ),
                   ),
                 ),
@@ -1147,7 +1147,7 @@ class MyHomePage extends StatelessWidget {
       duration: const Duration(seconds: 3),
       mainButton: TextButton(
         onPressed: () => Get.back(),
-        child: const Text("Tutup", style: TextStyle(color: Colors.white)),
+        child: Text("close".tr, style: const TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -1176,7 +1176,7 @@ class MyHomePage extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 Text(
-                  "Tambah Kategori",
+                  "add_category".tr,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -1191,7 +1191,7 @@ class MyHomePage extends StatelessWidget {
                   style: TextStyle(color: colors.tertiary), // 🔥 warna teks
                   cursorColor: colors.tertiary,
                   decoration: InputDecoration(
-                    hintText: "Nama kategori",
+                    hintText: "category_name_hint".tr,
                     hintStyle: TextStyle(color: colors.tertiary),
 
                     filled: true,
@@ -1239,12 +1239,12 @@ class MyHomePage extends StatelessWidget {
                     Get.back();
 
                     showSnack(
-                      title: "Sukses",
-                      message: "Kategori berhasil ditambahkan",
+                      title: "success".tr,
+                      message: "category_added".tr,
                     );
                   },
                   child: Text(
-                    "Simpan",
+                    "save".tr,
                     style: TextStyle(color: colors.inverseSurface),
                   ),
                 ),
@@ -1347,7 +1347,7 @@ class MyHomePage extends StatelessWidget {
 
               // AMOUNT
               Text(
-                "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern('id').format(amount)}",
+                "${isIncome ? '+' : '-'} Rp ${NumberFormat.decimalPattern(Get.locale?.languageCode ?? 'id').format(amount)}",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -1374,7 +1374,7 @@ class MyHomePage extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        "Edit",
+                        "edit_transaction".tr,
                         style: TextStyle(color: colors.tertiary),
                       ),
                     ),
@@ -1395,8 +1395,8 @@ class MyHomePage extends StatelessWidget {
                           titleTextStyle: TextStyle(color: colors.tertiary),
                           descTextStyle: TextStyle(color: colors.tertiary),
 
-                          title: 'Hapus Transaksi',
-                          desc: 'Yakin mau hapus transaksi ini?',
+                          title: 'delete_transaction'.tr,
+                          desc: 'delete_transaction_q'.tr,
                           btnCancelOnPress: () {},
                           btnCancelColor: colors.primary,
                           btnCancel: OutlinedButton(
@@ -1408,11 +1408,11 @@ class MyHomePage extends StatelessWidget {
                             ),
                             onPressed: () => Get.back(),
                             child: Text(
-                              "Batal",
+                              "cancel".tr,
                               style: TextStyle(color: colors.tertiary),
                             ),
                           ),
-                          btnOkText: "Hapus",
+                          btnOkText: "delete".tr,
                           btnOkColor: Colors.red,
                           btnOkOnPress: () async {
                             try {
@@ -1421,11 +1421,11 @@ class MyHomePage extends StatelessWidget {
                               Get.back();
 
                               showSnack(
-                                title: "Sukses",
-                                message: "Transaksi berhasil dihapus",
+                                title: "success".tr,
+                                message: "transaction_deleted".tr,
                               );
                             } catch (e) {
-                              showSnack(title: "Error", message: e.toString());
+                              showSnack(title: "error".tr, message: e.toString());
                             }
                           },
                         ).show();
@@ -1488,7 +1488,7 @@ class MyHomePage extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 Text(
-                  "Edit Transaksi",
+                  "edit_transaction".tr,
                   style: GoogleFonts.poppins(
                     textStyle: TextStyle(
                       fontSize: 16,
@@ -1507,7 +1507,7 @@ class MyHomePage extends StatelessWidget {
                   style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     labelStyle: TextStyle(color: colors.tertiary),
-                    hintText: "Rp 0",
+                    hintText: "amount_hint".tr,
                     hintStyle: const TextStyle(color: Colors.grey),
                     filled: true,
                     fillColor: const Color.fromARGB(217, 245, 245, 245),
@@ -1561,7 +1561,7 @@ class MyHomePage extends StatelessWidget {
                       body: Column(
                         children: [
                           Text(
-                            "Berhasil!",
+                            "success".tr,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -1572,7 +1572,7 @@ class MyHomePage extends StatelessWidget {
                           const SizedBox(height: 6),
 
                           Text(
-                            "Transaksi berhasil diubah!",
+                            "transaction_updated".tr,
                             style: TextStyle(
                               fontSize: 14,
                               color: colors.tertiary,
@@ -1595,7 +1595,7 @@ class MyHomePage extends StatelessWidget {
                     ).show();
                   },
                   child: Text(
-                    "Update",
+                    "update".tr,
                     style: TextStyle(color: colors.inverseSurface),
                   ),
                 ),
@@ -1619,7 +1619,7 @@ class MyHomePage extends StatelessWidget {
           ),
           const SizedBox(height: 15),
           Text(
-            'Tidak ada catatan',
+            'empty_state_history'.tr,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -1673,7 +1673,7 @@ Widget _buildSearchSheet(HomeController controller, BuildContext context) {
               controller.searchQuery.value = value;
             },
             decoration: InputDecoration(
-              hintText: "Cari transaksi",
+              hintText: "search_hint".tr,
               hintStyle: TextStyle(color: colors.tertiary),
               filled: true,
               fillColor: const Color.fromARGB(143, 245, 245, 245),

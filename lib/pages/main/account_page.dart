@@ -1,8 +1,10 @@
+// ignore_for_file: deprecated_member_use
 import 'package:fintrack/controllers/thme_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:fintrack/core/localization/localization_service.dart';
 
 class MyAccountPage extends StatelessWidget {
   final String title;
@@ -62,7 +64,7 @@ class MyAccountPage extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            "Hai, selamat datang di FinTrack!",
+                            "welcome_profile".tr,
                             style: TextStyle(color: Colors.grey),
                           ),
                         ],
@@ -84,7 +86,7 @@ class MyAccountPage extends StatelessWidget {
                           color: Color.fromARGB(255, 206, 192, 72),
                         ),
                         title: Text(
-                          "Pusat Premium",
+                          "premium_center".tr,
                           style: TextStyle(
                             color: Color.fromARGB(255, 206, 192, 72),
                           ),
@@ -112,19 +114,29 @@ class MyAccountPage extends StatelessWidget {
                             _buildMenuItem(
                               context,
                               icon: Icons.thumb_up_alt_outlined,
-                              title: "Rekomendasikan ke teman",
+                              title: "recommend_to_friends".tr,
                             ),
                             _divider(context),
                             _buildMenuItem(
                               context,
                               icon: Icons.block,
-                              title: "Blokir Iklan",
+                              title: "block_ads".tr,
                             ),
                             _divider(context),
                             _buildMenuItem(
                               context,
                               icon: Icons.settings,
-                              title: "Pengaturan",
+                              title: "settings".tr,
+                            ),
+                            _divider(context),
+                            _buildMenuItem(
+                              context,
+                              icon: Icons.language,
+                              title: "language".tr,
+                              subtitle: LocalizationService.currentLanguageName,
+                              onTap: () {
+                                _showLanguageDialog(context);
+                              },
                             ),
                             _divider(context),
                             Obx(
@@ -136,7 +148,7 @@ class MyAccountPage extends StatelessWidget {
                                 ),
 
                                 title: Text(
-                                  "Dark Mode",
+                                  "dark_mode".tr,
                                   style: TextStyle(
                                     color: colors.inverseSurface,
                                   ),
@@ -171,16 +183,77 @@ class MyAccountPage extends StatelessWidget {
     );
   }
 
+  void _showLanguageDialog(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final currentLang = LocalizationService.currentLocale.languageCode;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: colors.secondary,
+          title: Text(
+            "language".tr,
+            style: TextStyle(
+              color: colors.tertiary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                title: Text("🇺🇸 English", style: TextStyle(color: colors.tertiary)),
+                value: "en",
+                groupValue: currentLang,
+                activeColor: Colors.teal,
+                onChanged: (value) {
+                  if (value != null) {
+                    LocalizationService.changeLocale(value);
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+              RadioListTile<String>(
+                title: Text("🇮🇩 Bahasa Indonesia", style: TextStyle(color: colors.tertiary)),
+                value: "id",
+                groupValue: currentLang,
+                activeColor: Colors.teal,
+                onChanged: (value) {
+                  if (value != null) {
+                    LocalizationService.changeLocale(value);
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildMenuItem(
     BuildContext context, {
     required IconData icon,
     required String title,
+    String? subtitle,
     bool showDot = false,
+    VoidCallback? onTap,
   }) {
     final colors = Theme.of(context).colorScheme;
     return ListTile(
       leading: Icon(icon, color: colors.inverseSurface),
       title: Text(title, style: TextStyle(color: colors.inverseSurface)),
+      subtitle: subtitle != null
+          ? Text(
+              subtitle,
+              style: TextStyle(
+                color: colors.inverseSurface.withValues(alpha: 0.6),
+                fontSize: 12,
+              ),
+            )
+          : null,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -197,7 +270,7 @@ class MyAccountPage extends StatelessWidget {
           Icon(Icons.chevron_right, color: colors.inverseSurface),
         ],
       ),
-      onTap: () {},
+      onTap: onTap ?? () {},
     );
   }
 

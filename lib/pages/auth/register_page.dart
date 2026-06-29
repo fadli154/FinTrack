@@ -102,7 +102,7 @@ class RegisterPage extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.only(top: 80, bottom: 20),
                           child: Text(
-                            "Register here",
+                            "register_here".tr,
                             style: GoogleFonts.poppins(
                               textStyle: TextStyle(
                                 color: colors.surface,
@@ -118,7 +118,7 @@ class RegisterPage extends StatelessWidget {
                           width: 260,
                           child: Text(
                             textAlign: TextAlign.center,
-                            "Create your account to get started",
+                            "create_account_start".tr,
                             style: GoogleFonts.poppins(
                               textStyle: TextStyle(
                                 color: colors.tertiary,
@@ -136,7 +136,7 @@ class RegisterPage extends StatelessWidget {
                           style: TextStyle(color: colors.onSurface),
 
                           decoration: InputDecoration(
-                            labelText: "Name",
+                            labelText: "name".tr,
 
                             filled: true,
                             fillColor: colors.surface.withValues(alpha: .35),
@@ -190,7 +190,7 @@ class RegisterPage extends StatelessWidget {
                           style: TextStyle(color: colors.onSurface),
 
                           decoration: InputDecoration(
-                            labelText: "Email",
+                            labelText: "email".tr,
 
                             filled: true,
                             fillColor: colors.surface.withValues(alpha: .35),
@@ -245,7 +245,7 @@ class RegisterPage extends StatelessWidget {
                             style: TextStyle(color: colors.onSurface),
 
                             decoration: InputDecoration(
-                              labelText: "Password",
+                              labelText: "password".tr,
 
                               filled: true,
                               fillColor: colors.surface.withValues(alpha: .35),
@@ -349,7 +349,7 @@ class RegisterPage extends StatelessWidget {
                                         color: Colors.white,
                                       )
                                     : Text(
-                                        "Register",
+                                        "register".tr,
                                         style: GoogleFonts.poppins(
                                           textStyle: TextStyle(
                                             fontSize: 16,
@@ -372,11 +372,11 @@ class RegisterPage extends StatelessWidget {
                           style: ButtonStyle(),
                           child: RichText(
                             text: TextSpan(
-                              text: "Sudah punya akun? ",
+                              text: "already_have_account".tr,
                               style: TextStyle(color: colors.tertiary),
                               children: [
                                 TextSpan(
-                                  text: "Login",
+                                  text: "login".tr,
                                   style: GoogleFonts.poppins(
                                     textStyle: TextStyle(
                                       color: colors.surface,

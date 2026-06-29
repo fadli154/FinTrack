@@ -55,7 +55,12 @@ class _YoloPageState extends State<YoloPage>
     vision = FlutterVision();
     tts = FlutterTts();
 
-    await tts.setLanguage("id-ID");
+    final langCode = Get.locale?.languageCode ?? 'en';
+    if (langCode == 'id') {
+      await tts.setLanguage("id-ID");
+    } else {
+      await tts.setLanguage("en-US");
+    }
     await tts.setSpeechRate(speechRate);
 
     if (cameras.isEmpty) return;
@@ -253,8 +258,8 @@ class _YoloPageState extends State<YoloPage>
                 Expanded(
                   child: Text(
                     isRealtime
-                        ? 'Deteksi uang realtime aktif'
-                        : 'Deteksi berhenti',
+                        ? 'yolo_active'.tr
+                        : 'yolo_stopped'.tr,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -265,7 +270,7 @@ class _YoloPageState extends State<YoloPage>
                 Chip(
                   backgroundColor: Colors.black12,
                   label: Text(
-                    '${yoloResults.length} objek',
+                    'yolo_objects'.trParams({'count': yoloResults.length.toString()}),
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
@@ -291,21 +296,21 @@ class _YoloPageState extends State<YoloPage>
               children: [
                 Expanded(
                   child: _metric(
-                    'Voice',
+                    'yolo_voice'.tr,
                     voiceEnabled ? 'ON' : 'OFF',
                     Icons.volume_up,
                   ),
                 ),
                 Expanded(
                   child: _metric(
-                    'Speed',
+                    'yolo_speed'.tr,
                     speechRate.toStringAsFixed(1),
                     Icons.speed,
                   ),
                 ),
                 Expanded(
                   child: _metric(
-                    'Conf',
+                    'yolo_conf'.tr,
                     confThreshold.toStringAsFixed(1),
                     Icons.analytics,
                   ),
@@ -315,7 +320,7 @@ class _YoloPageState extends State<YoloPage>
 
             const SizedBox(height: 20),
 
-            _sliderTitle('Kecepatan suara', Icons.record_voice_over),
+            _sliderTitle('yolo_voice_speed'.tr, Icons.record_voice_over),
 
             Slider(
               value: speechRate,
@@ -327,7 +332,7 @@ class _YoloPageState extends State<YoloPage>
               },
             ),
 
-            _sliderTitle('Interval pengulangan suara', Icons.timer),
+            _sliderTitle('yolo_voice_interval'.tr, Icons.timer),
 
             Slider(
               value: speakCooldown,
@@ -339,7 +344,7 @@ class _YoloPageState extends State<YoloPage>
               },
             ),
 
-            _sliderTitle('Sensitivity detection', Icons.tune),
+            _sliderTitle('yolo_sensitivity'.tr, Icons.tune),
 
             Slider(
               value: confThreshold,
@@ -364,9 +369,9 @@ class _YoloPageState extends State<YoloPage>
                     icon: Icon(
                       voiceEnabled ? Icons.volume_up : Icons.volume_off,
                     ),
-                    label: const Text(
-                      'Voice',
-                      style: TextStyle(
+                    label: Text(
+                      'yolo_voice'.tr,
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 10,
                         color: Colors.white,
@@ -400,7 +405,7 @@ class _YoloPageState extends State<YoloPage>
                         color: Colors.white,
                       ),
                       label: Text(
-                        isRealtime ? 'Stop Scan' : 'Start Scan',
+                        isRealtime ? 'yolo_stop_scan'.tr : 'yolo_start_scan'.tr,
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
